@@ -1,0 +1,30 @@
+---
+- name: Install phpmyadmin
+  apt:
+    name: phpmyadmin
+    state: present
+
+- name: Set up config file
+  template:
+    src: config.inc.php
+    dest: /etc/phpmyadmin/config.inc.php
+    force: no
+
+- name: Check that the certificate exists
+  become: true
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: pma_cert
+
+- name: Add phpmyadmin domain
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/phpmyadmin.textual.ru.conf
+  notify: reload apache
+
+- name: Enable phpmyadmin domain
+  file:
+    src: /etc/apache2/sites-available/phpmyadmin.textual.ru.conf
+    dest: /etc/apache2/sites-enabled/phpmyadmin.textual.ru.conf
+    state: link
+  notify: reload apache

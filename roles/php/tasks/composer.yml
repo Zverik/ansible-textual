@@ -1,0 +1,41 @@
+---
+# See https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
+
+- name: Check that we don't have composer yet
+  stat:
+    path: /usr/local/bin/composer
+  register: composer_bin
+
+- name: Download composer installer
+  when: not composer_bin.stat.exists
+  get_url:
+    url: "https://getcomposer.org/installer"
+    dest: /srv/composer-setup.php
+
+# TODO: check composer hash code
+
+- name: Run composer installer
+  when: not composer_bin.stat.exists
+  command:
+    argv:
+      - /usr/bin/php
+      - /srv/composer-setup.php
+      - --quiet
+    chdir: /srv
+
+- name: Copy composer dist to /usr/local/bin
+  when: not composer_bin.stat.exists
+  copy:
+    src: /srv/composer.phar
+    dest: /usr/local/bin/composer
+    mode: 0777
+    remote_src: true
+
+- name: Remove temporary files
+  file:
+    path: /srv/{{ item }}
+    state: absent
+  loop:
+    - composer-setup.php
+    - composer.phar
+

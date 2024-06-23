@@ -1,0 +1,52 @@
+---
+- name: Check that phpMyAdmin is installed
+  stat:
+    path: /var/www/phpmyadmin
+  register: adm
+
+- name: Downloading phpMyAdmin
+  when: not adm.stat.exists
+  unarchive:
+    src: "{{ phpmyadmin_url }}"
+    remote_src: yes
+    dest: /var/www
+    owner: "{{ admin }}"
+
+- name: Rename phpMyAdmin directory
+  when: not adm.stat.exists
+  command: mv /var/www/{{ phpmyadmin_name }} /var/www/phpmyadmin
+
+- name: Set up database
+  when: not adm.stat.exists
+  mysql_db:
+    state: import
+    target: /var/www/phpmyadmin/sql/create_tables.sql
+    name: all
+
+- name: Create pma user
+  mysql_user:
+    name: pma
+    password: "{{ phpmyadmin_user_password }}"
+    priv: 'phpmyadmin.*:ALL'
+    state: present
+  no_log: True
+
+- name: Set up config file
+  template:
+    src: config.inc.php
+    dest: /var/www/phpmyadmin/config.inc.php
+    force: no
+    mode: 0660
+
+- name: Chmod to apache
+  file:
+    path: /var/www/phpmyadmin
+    recurse: yes
+    owner: apache
+
+- name: Add domain
+  template:
+    src: domain.j2
+    dest: /etc/httpd/domains/phpmyadmin.textual.ru
+    owner: apache
+  notify: reload apache

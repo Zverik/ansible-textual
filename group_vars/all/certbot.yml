@@ -1,0 +1,40 @@
+certbot_admin_email: ilya@zverev.info
+certbot_create_if_missing: true
+certbot_create_method: standalone
+certbot_create_standalone_stop_services: [apache2]
+
+letsencrypt_cert_path: /etc/letsencrypt/live/josm.ru
+
+certbot_certs:
+  - email: ilya@zverev.info
+    domains:
+      - josm.ru
+      - textual.ru
+      - not.textual.ru
+      - pin-x.textual.ru
+      - phpmyadmin.textual.ru
+      - offsets.textual.ru
+      - ilya.zverev.info
+      - zverev.info
+      - 2013.sotm-baltics.org
+      - sotm-baltics.org
+      - level0.osmz.ru
+
+# Needed to add --expand
+certbot_create_command: >-
+  {{ certbot_script }} certonly --{{ certbot_create_method  }}
+  {{ '--hsts' if certbot_hsts else '' }}
+  {{ '--test-cert' if certbot_testmode else '' }}
+  --noninteractive --agree-tos
+  --expand
+  --email {{ cert_item.email | default(certbot_admin_email) }}
+  {{ '--webroot-path ' if certbot_create_method == 'webroot'  else '' }}
+  {{ cert_item.webroot | default(certbot_webroot) if certbot_create_method == 'webroot' else '' }}
+  -d {{ cert_item.domains | join(',') }}
+  {{ '--pre-hook /etc/letsencrypt/renewal-hooks/pre/stop_services'
+    if certbot_create_standalone_stop_services and certbot_create_method == 'standalone'
+  else '' }}
+  {{ '--post-hook /etc/letsencrypt/renewal-hooks/post/start_services'
+    if certbot_create_standalone_stop_services and certbot_create_method == 'standalone'
+  else '' }}
+

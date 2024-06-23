@@ -1,0 +1,13 @@
+---
+- name: Upload nodeid script
+  copy:
+    src: update_node_id.pl
+    dest: /opt/src
+    mode: 0755
+
+- name: Set up nodeid cron job
+  cron:
+    name: node_id
+    job: /opt/src/update_node_id.pl
+    minute: '1'
+    hour: '*/3'

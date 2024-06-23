@@ -1,0 +1,29 @@
+{% if pinx_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName pin-x.textual.ru
+  DocumentRoot {{ sites }}/pin-x.ru
+
+  CustomLog /var/log/apache2/pin-x.ru/access_log combined
+  ErrorLog /var/log/apache2/pin-x.ru/error_log
+
+{% if pinx_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/pin-x.ru>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if pinx_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName pin-x.textual.ru
+	Redirect permanent / https://pin-x.textual.ru/
+</VirtualHost>
+{% endif %}

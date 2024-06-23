@@ -1,0 +1,42 @@
+{% if sotm_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName 2013.sotm-baltics.org
+  DocumentRoot {{ sites }}/sotm-baltics.org
+
+  CustomLog /var/log/apache2/sotm-baltics.org/access_log combined
+  ErrorLog /var/log/apache2/sotm-baltics.org/error_log
+
+{% if sotm_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/sotm-baltics.org>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if sotm_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName 2013.sotm-baltics.org
+  ServerAlias www.2013.sotm-baltics.org
+	Redirect permanent / https://2013.sotm-baltics.org/
+</VirtualHost>
+{% endif %}
+
+<VirtualHost *:443>
+  ServerName sotm-baltics.org
+  ServerAlias www.sotm-baltics.org
+	Redirect permanent / https://2023.sotm-baltics.org/
+</VirtualHost>
+
+<VirtualHost *:80>
+  ServerName sotm-baltics.org
+  ServerAlias www.sotm-baltics.org
+	Redirect permanent / https://2023.sotm-baltics.org/
+</VirtualHost>

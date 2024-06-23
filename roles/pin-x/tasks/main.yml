@@ -1,0 +1,54 @@
+---
+- name: Create directory for pin-x.ru
+  become: yes
+  file:
+    path: "{{ sites }}/pin-x.ru"
+    state: directory
+    owner: www-data
+
+- name: Add pin-x to backup
+  become: yes
+  cron:
+    name: backup pin-x.ru
+    minute: 0
+    hour: 4
+    job: /root/make_backup PinX "{{ sites }}/pin-x.ru"
+
+- name: Restore pin-x
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - PinX
+      - '*'
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/pin-x.ru
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: pinx_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/pin-x.ru.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/pin-x.ru.conf
+    dest: /etc/apache2/sites-enabled/pin-x.ru.conf
+    state: link
+  notify: reload apache

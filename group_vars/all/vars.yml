@@ -1,0 +1,43 @@
+---
+ntp_timezone: Europe/Tallinn
+admin_email: ilya@zverev.info
+admin: zverik
+
+borg_repo: "{{ v_borg_repo }}"
+borg_pass: "{{ v_borg_pass }}"
+borg_key: "{{ v_borg_key }}"
+
+mysql_root_password: "{{ v_mysql_root_password }}"
+mysql_user_home: /home/zverik
+mysql_user_name: zverik
+mysql_user_password: "{{ v_mysql_user_password }}"
+mysql_packages: [mariadb-client, mariadb-server, python3-mysqldb]
+
+sites: /var/www/sites
+
+phpmyadmin_user_password: "{{ v_phpmyadmin_user_password }}"
+
+maxmind_account: "{{ v_maxmind_account }}"
+maxmind_license: "{{ v_maxmind_license }}"
+
+osm_autoreverter_password: "{{ v_osm_autoreverter_password }}"
+
+whosthat_database: osmochat
+whosthat_user: osmochat
+whosthat_password: "{{ v_osmochat_password }}"
+
+offsets_client_id: "{{ v_offsets_client_id }}"
+offsets_client_secret: "{{ v_offsets_client_secret }}"
+offsets_mysql_password: "{{ v_offsets_mysql_password }}"
+seen_mysql_password: "{{ v_seen_mysql_password }}"
+level0_client_id: "{{ v_level0_client_id }}"
+level0_client_secret: "{{ v_level0_client_secret }}"
+
+piwik_db_password: "{{ v_piwik_db_password }}"
+piwik_salt: "{{ v_piwik_salt }}"
+
+letsencrypt_account_key: "{{ v_letsencrypt_account_key }}"
+
+svn_realm: zverik-realm
+svn_user: "{{ v_svn_user }}"
+svn_password: "{{ v_svn_password }}"

@@ -1,0 +1,86 @@
+---
+- name: Create directory for textual.ru
+  file:
+    path: "{{ sites }}/textual.ru"
+    state: directory
+
+- name: Create textual/cgi-bin
+  file:
+    path: "{{ sites }}/textual.ru/cgi-bin"
+    state: directory
+
+- name: Upload cgi-bin scripts
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/textual.ru/cgi-bin/{{ item }}"
+    mode: 0755
+  with_items:
+    - heroeswar.pl
+    - polyconvert.pl
+
+- name: Create textual/tmp for cgi scripts
+  file:
+    path: "{{ sites }}/textual.ru/tmp"
+    mode: 0777
+    state: directory
+
+- name: Create textual/www
+  file:
+    path: "{{ sites }}/textual.ru/www"
+    state: directory
+
+- name: Create textual symlink
+  file:
+    path: "/home/{{ admin }}/textual"
+    src: "{{ sites }}/textual.ru/www"
+    state: link
+
+- name: Add textual to backup
+  become: yes
+  cron:
+    name: backup textual www
+    minute: 0
+    hour: 4
+    job: /root/make_backup Textual "{{ sites }}/textual.ru/www"
+
+- name: Restore textual
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - Textual
+      - '*'
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/textual.ru
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: textual_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/textual.ru.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/textual.ru.conf
+    dest: /etc/apache2/sites-enabled/textual.ru.conf
+    state: link
+  notify: reload apache
+
+- name: Set up nodeid
+  include_tasks: nodeid.yml

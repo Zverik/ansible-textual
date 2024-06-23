@@ -1,0 +1,44 @@
+---
+- name: Install Apache
+  apt: name=apache2
+
+- name: Add 7z mime type
+  lineinfile:
+    path: /etc/apache2/mods-available/mime.conf
+    insertafter: EOF
+    line: AddType application/x-7z-compressed 7z
+  notify: reload apache
+
+- name: Prohibit .git serving
+  copy:
+    src: prohibit-git.conf
+    dest: /etc/apache2/mods-available/
+
+- name: Enable prohibition
+  file:
+    src: /etc/apache2/mods-available/prohibit-git.conf
+    path: /etc/apache2/mods-enabled/prohibit-git.conf
+    state: link
+
+- name: Enable httpd
+  systemd:
+    name: apache2
+    enabled: yes
+
+- name: Enable apache mod_ssl
+  apache2_module:
+    name: ssl
+    state: present
+  notify: restart apache
+
+- name: Enable apache mod_rewrite
+  apache2_module:
+    name: rewrite
+    state: present
+  notify: restart apache
+
+- name: Allow {{ admin }} to see logs
+  file:
+    path: /var/log/apache2
+    state: directory
+    mode: 01777

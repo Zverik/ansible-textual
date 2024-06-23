@@ -1,0 +1,71 @@
+---
+- name: Install or update aegea
+  import_tasks: files.yml
+
+- name: Create seen mysql db
+  become: true
+  mysql_db:
+    name: "{{ seen_mysql_db }}"
+    state: present
+
+- name: Create seen mysql user
+  become: true
+  mysql_user:
+    name: "{{ seen_mysql_user }}"
+    password: "{{ seen_mysql_password }}"
+    priv: "{{ seen_mysql_db }}.*:ALL"
+
+- name: Enable apache mod_rewrite
+  become: yes
+  apache2_module:
+    name: rewrite
+    state: present
+  notify: restart apache
+
+- name: Add seeing to backup
+  become: yes
+  cron:
+    name: backup seen
+    minute: 0
+    hour: 4
+    job: /root/make_backup_db Seeing {{ seen_mysql_db }} "{{ sites }}/{{ domain }}/user" "{{ sites }}/{{ domain }}/pictures"
+
+- name: Restore seeing
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup_db"
+      - Seeing
+      - "{{ seen_mysql_db }}"
+      - '*'
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: seeing_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

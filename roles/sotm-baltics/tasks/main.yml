@@ -1,0 +1,55 @@
+---
+- name: Create directory for sotm-baltics
+  become: yes
+  file:
+    path: "{{ sites }}/sotm-baltics.org"
+    state: directory
+    owner: zverik
+    mode: '0755'
+
+- name: Add sotm-baltics to backup
+  become: yes
+  cron:
+    name: backup sotm-baltics
+    minute: 0
+    hour: 4
+    job: /root/make_backup SotmBaltics "{{ sites }}/sotm-baltics.org"
+
+- name: Restore sotm-baltics
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - SotmBaltics
+      - '*'
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/sotm-baltics.org
+    state: directory
+    mode: '0755'
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: sotm_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/sotm-baltics.org.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/sotm-baltics.org.conf
+    dest: /etc/apache2/sites-enabled/sotm-baltics.org.conf
+    state: link
+  notify: reload apache

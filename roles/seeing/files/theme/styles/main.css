@@ -1,0 +1,16 @@
+:root {
+    --noteTitleFontSize: 16px;
+    --noteTitleLineHeight: 1.2;
+}
+
+.title {
+    max-width: none;
+}
+
+.title h1 {
+    font-size: 20px;
+}
+
+.spotlight, #e2-blog-description {
+    font-size: 90%;
+}

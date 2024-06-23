@@ -1,0 +1,10 @@
+---
+- name: restart znc
+  become: yes
+  systemd:
+    name: znc
+    state: restarted
+
+- name: restart ufw
+  become: yes
+  systemd: name=ufw state=restarted

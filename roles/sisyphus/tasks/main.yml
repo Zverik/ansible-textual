@@ -1,0 +1,20 @@
+---
+- name: Check out sysiphus
+  git:
+    repo: https://github.com/Zverik/sisyphus.git
+    dest: /opt/src/sisyphus
+    recursive: yes
+    track_submodules: yes
+  tags: [update, sisyphus]
+
+- name: Upload sysiphus config
+  template:
+    src: config.py.j2
+    dest: /opt/src/sisyphus/config_local.py
+  tags: [update, sisyphus]
+
+- name: Add sisyphus to crontab
+  cron:
+    name: Sysiphus
+    job: "/usr/bin/python3 /opt/src/sisyphus/sisyphus.py >> /opt/src/sisyphus/run.log 2>&1"
+    minute: "50"

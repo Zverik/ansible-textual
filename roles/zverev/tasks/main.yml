@@ -1,0 +1,51 @@
+---
+- name: Create zverev.info directory
+  file:
+    path: "{{ sites }}/zverev.info"
+    state: directory
+
+- name: Add zverev.info to backup
+  become: yes
+  cron:
+    name: backup zverev.info
+    minute: 0
+    hour: 4
+    job: /root/make_backup Zverev "{{ sites }}/zverev.info"
+
+- name: Restore zverev.info
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - Zverev
+      - '*'
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/zverev.info
+    state: directory
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: zverev_cert
+
+- name: Upload domain in apache
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/ilya.zverev.info.conf
+  notify: reload apache
+
+- name: Enable domain in apache
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/ilya.zverev.info.conf
+    dest: /etc/apache2/sites-enabled/ilya.zverev.info.conf
+    state: link
+  notify: reload apache

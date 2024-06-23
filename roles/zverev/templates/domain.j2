@@ -1,0 +1,40 @@
+{% if zverev_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName ilya.zverev.info
+  ServerAlias ilia.zverev.info ilja.zverev.info
+  DocumentRoot {{ sites }}/zverev.info/ilya
+  CustomLog /var/log/apache2/zverev.info/access_log combined
+  ErrorLog /var/log/apache2/zverev.info/error_log
+
+{% if zverev_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/zverev.info/ilya>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+  ServerName zverev.info
+  ServerAlias *.zverev.info
+{% if zverev_cert.stat.exists %}
+	Redirect permanent / https://ilya.zverev.info/
+{% else %}
+	Redirect permanent / http://ilya.zverev.info/
+{% endif %}
+</VirtualHost>
+
+{% if zverev_cert.stat.exists %}
+<VirtualHost *:443>
+  ServerName zverev.info
+  ServerAlias *.zverev.info
+	Redirect permanent / https://ilya.zverev.info/
+</VirtualHost>
+{% endif %}

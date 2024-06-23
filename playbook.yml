@@ -1,0 +1,80 @@
+---
+- hosts: all
+  gather_facts: no
+  become: yes
+  roles:
+    - common
+
+- hosts: all
+  tasks:
+    - name: Check that we're not a root user
+      when: ansible_env.USER != admin
+      fail:
+        msg: Please restart the playbook with {{ admin }} user.
+
+- hosts: all
+  become: yes
+  roles:
+    - { role: geerlingguy.ntp, tags: ntp }
+    - { role: geerlingguy.mysql, tags: mysql }
+    - { role: backup, tags: backup }
+    - { role: apache, tags: apache }
+    - { role: firewall, tags: firewall }
+    - { role: php, tags: php }
+    - { role: phpmyadmin, tags: phpmyadmin }
+    - { role: awstats, tags: awstats }
+    - { role: geerlingguy.certbot, tags: certbot }
+    - { role: svn, tags: svn }
+    - { role: znc, tags: znc }
+
+- hosts: all
+  remote_user: "{{ admin }}"
+  roles:
+    # zverev.info
+    - { role: zverev, tags: zverev }
+
+    # textual.ru
+    - { role: textual, tags: textual }
+    - { role: not-textual, tags: not_textual }
+    - { role: offsets, tags: offsets }
+    - { role: pin-x, tags: pinx }
+    - { role: seeing, tags: seeing }
+
+    # osmz.ru
+    - { role: osmz, tags: osmz }
+    - { role: ommm, tags: ommm }
+    - { role: level0, tags: level0 }
+    # - whosthat
+    # - bigmap2
+    # - revertui
+    # - osmauth
+    # - cf_audit
+    # - osmvoting
+    # - radio
+    # - welcomeosm
+    # - vakhtyor
+    # - osmstreak
+
+    # other
+    - { role: josmru, tags: josmru }
+    - { role: sotm-baltics, tags: sotm }
+    # - sharemap
+    # - shtosm
+    # - shtosm-twitter
+
+- hosts: localhost
+  tasks:
+    - name: Test connection to websites
+      uri:
+        url: "https://{{ item }}/"
+        status_code: 200
+      with_items:
+        - shtosm.ru
+        - ilya.zverev.info
+        - textual.ru
+        - seen.textual.ru
+        - offsets.textual.ru
+        - osmz.ru
+        - level0.osmz.ru
+        - josm.ru
+      tags: [test]

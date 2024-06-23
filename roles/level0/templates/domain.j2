@@ -1,0 +1,30 @@
+{% if level0_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  DocumentRoot {{ sites }}/osmz.ru/level0/www
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if level0_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/osmz.ru/level0/www>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if level0_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}

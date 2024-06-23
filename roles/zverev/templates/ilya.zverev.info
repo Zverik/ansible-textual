@@ -1,0 +1,36 @@
+<VirtualHost *:80>
+        ServerName ilya.zverev.info
+        ServerAlias ilia.zverev.info ilja.zverev.info
+        DocumentRoot {{ sites }}/zverev.info/ilya
+        CustomLog /var/log/apache2/zverev.info/access_log combined
+        ErrorLog /var/log/apache2/zverev.info/error_log
+
+        <Directory {{ sites }}/zverev.info/ilya>
+                Options FollowSymLinks Includes MultiViews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+        ServerName zverev.info
+        ServerAlias *.zverev.info
+        Redirect permanent / http://ilya.zverev.info/
+</VirtualHost>
+
+{% if zverev_cert.stat.exists %}
+<VirtualHost *:443>
+        ServerName ilya.zverev.info
+        DocumentRoot {{ sites }}/zverev.info/ilya
+        CustomLog /var/log/apache2/zverev.info/access_log combined
+        ErrorLog /var/log/apache2/zverev.info/error_log
+
+        SSLEngine on
+        SSLCertificateFile "/etc/letsencrypt/certs/fullchain_ilya.zverev.info.crt"
+        SSLCertificateKeyFile "/etc/letsencrypt/keys/ilya.zverev.info.key"
+
+        <Directory {{ sites }}/zverev.info/ilya>
+                Options FollowSymLinks Includes MultiViews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+{% endif %}

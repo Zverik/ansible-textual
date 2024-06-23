@@ -1,0 +1,72 @@
+---
+- name: Install python for Ansible
+  raw: test -e /usr/bin/python3 || (apt -qy update && apt install -y python3-minimal)
+  register: output
+  changed_when: output.stdout
+
+- name: Ensure apt cache is up to date
+  apt: update_cache=yes cache_valid_time=3600 upgrade=dist
+  changed_when: False
+
+- name: Install base packages
+  apt:
+    name:
+      - python3
+      - git
+      - wget
+    state: present
+
+- name: install setfacl support
+  apt: name=acl
+
+- name: Create {{ admin }} user
+  user:
+    name: "{{ admin }}"
+    shell: /bin/bash
+
+- name: Add a ssh key to {{ admin }}
+  authorized_key:
+    user: "{{ admin }}"
+    state: present
+    key: ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBP2SWls1C24jvQ9F3MVFQ2Lyl0zgWheBqellShhlF5d8RWP61/C8pr/ejiowEDxtTrvrd0iJum6amOvFp9I5eAXJGIoVxQiD0Y5ae+TaaVfsu/5XlwedQin31OmkdnRyrA== zverik@fedora
+
+- name: Add {{ admin }} to sudoers
+  copy:
+    content: "{{ admin }} ALL=(ALL) NOPASSWD:ALL"
+    dest: /etc/sudoers.d/admin
+
+- name: Remove ssh authorized_key
+  file:
+    path: /root/.ssh/authorized_keys
+    state: absent
+
+- name: Forbid root ssh login
+  copy:
+    src: noroot.conf
+    dest: /etc/ssh/sshd_config.d/
+  notify: restart sshd
+
+- name: Install useful packages
+  apt:
+    name:
+      - tmux
+      - htop
+      - ncdu
+      - vim
+      - sqlite3
+    state: present
+
+- name: Create sites with permissions for {{ admin }}
+  file:
+    path: "{{ sites }}"
+    state: directory
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+
+- name: Create /opt/src directory
+  file:
+    path: /opt/src
+    state: directory
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    mode: 0755

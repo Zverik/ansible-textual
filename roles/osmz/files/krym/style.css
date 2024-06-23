@@ -1,0 +1,68 @@
+body {
+	font-size: 14pt;
+	font-family: sans-serif;
+	margin: 20px;
+}
+
+h1 {
+	font-size: 60pt;
+	font-weight: normal;
+	margin: 0 0 20px;
+}
+
+#clock {
+	font-size: 24pt;
+	font-style: italic;
+}
+
+ul#tab-container-nav {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1em;
+	border-bottom: 1px solid #2a2;
+}
+
+#tab-container-nav li {
+	display: inline-block;
+	margin: 0 0.5em 0 0;
+}
+
+#tab-container-nav a {
+	display: inline-block;
+	padding: 10px;
+	border-radius: 10px 10px 0 0;
+	background: #eee;
+	color: black;
+	text-decoration: none;
+}
+
+#tab-container-nav a:hover {
+	background: #ddd;
+}
+
+#tab-container-nav a.active {
+	background: #2a2;
+	color: white;
+}
+
+#map {
+	height: 600px;
+}
+
+.user-icon {
+	background: #ddd;
+	color: blue;
+	padding: 0 5px;
+	border-radius: 5px;
+	width: auto !important;
+	height: auto !important;
+	font-size: 8pt;
+}
+
+#tab-about p, #tab-about-uk p {
+	max-width: 900px;
+}
+
+#user-table td {
+	padding-right: 3em;
+}

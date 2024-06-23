@@ -1,0 +1,68 @@
+---
+- name: Check out josm.ru source
+  git:
+    repo: https://github.com/Zverik/josm.ru.git
+    dest: "{{ sites }}/{{ domain }}"
+
+- name: Add crontab for josm.ru
+  cron:
+    name: josm_version
+    state: present
+    job: "/usr/bin/wget https://josm.openstreetmap.de/version -q -O {{ sites }}/{{ domain }}/version"
+    minute: "0"
+
+- name: Add josm changelog to backup
+  become: yes
+  cron:
+    name: backup josm changelog
+    minute: 0
+    hour: 4
+    job: /root/make_backup Josm "{{ sites }}/{{ domain }}/changelog.txt"
+
+- name: Restore josm changelog
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - Josm
+      - '*'
+    chdir: /
+
+- name: Create changelog.txt
+  shell:
+    cmd: head -n 100 "{{ sites }}/{{ domain }}/changelog-archive.txt" > "{{ sites }}/{{ domain }}/changelog.txt"
+    creates: "{{ sites }}/{{ domain }}/changelog.txt"
+
+- name: Set write permissions for changelog.txt
+  file:
+    path: "{{ sites }}/{{ domain }}/changelog.txt"
+    mode: '0666'
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/{{ domain }}
+    state: directory
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: true
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: josm_cert
+
+- name: Upload domain config
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

@@ -1,0 +1,6 @@
+---
+phpmyadmin_version: 5.2.1
+phpmyadmin_name: phpMyAdmin-{{ phpmyadmin_version }}-english
+phpmyadmin_url: https://files.phpmyadmin.net/phpMyAdmin/{{ phpmyadmin_version }}/{{ phpmyadmin_name }}.tar.gz
+phpmyadmin_checksum: 126de3e402345b79295216386571395281982077243b6ac3fdcf6b0c54ae4b6f
+phpmyadmin_user_password: ''

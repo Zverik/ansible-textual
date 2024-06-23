@@ -1,0 +1,47 @@
+---
+- name: Install php and its apache module
+  apt:
+    name:
+      - php
+      - php-mysqlnd
+      - php-mbstring
+      - php-gd
+      - php-cli
+      - php-pear
+      - php-xml
+      - php-gmp
+      - php-sqlite3
+    state: present
+  notify: restart apache
+
+- name: Set php timezone
+  lineinfile:
+    path: "/etc/php/{{ php_version }}/apache2/php.ini"
+    insertbefore: ';date.timezone'
+    line: "date.timezone = {{ ntp_timezone }}"
+  notify: restart apache
+
+- name: Enable modules
+  lineinfile:
+    path: "/etc/php/{{ php_version }}/apache2/php.ini"
+    regexp: "^;?extension\\s*=\\s*{{ item }}"
+    line: "extension={{ item }}"
+  loop:
+    - gmp
+    - gd
+    - mysqli
+    - gettext
+    - sqlite3
+    - pdo-mysql
+    - mbstring
+  notify: restart apache
+
+- name: Enable short open tag
+  lineinfile:
+    path: "/etc/php/{{ php_version }}/apache2/php.ini"
+    regexp: '^short_open_tag\\s*='
+    line: "short_open_tag = On"
+  notify: restart apache
+
+- name: Install composer
+  import_tasks: composer.yml

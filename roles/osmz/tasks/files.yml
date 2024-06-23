@@ -1,0 +1,30 @@
+---
+- name: Upload files for birzha
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/osmz.ru/birzha/"
+  with_fileglob: "birzha/*"
+
+- name: Upload files for pt
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/osmz.ru/pt/"
+  with_fileglob: "pt/*"
+
+- name: Upload files for krym
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/osmz.ru/krym/"
+  with_fileglob: "krym/*"
+
+- name: Upload files for cards
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/osmz.ru/cards/"
+  with_fileglob: "cards/*"
+
+- name: Upload files for dms
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/osmz.ru/dms/"
+  with_fileglob: "dms/*"

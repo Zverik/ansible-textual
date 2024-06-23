@@ -1,0 +1,22 @@
+#!/bin/bash
+set -u -e
+[ "$(whoami)" != "root" ] && echo "Please run this script as a root" && exit 1
+[ $# -lt 2 ] && echo "Usage: $0 <prefix> <db> [<path> ('*' for all)]" && exit 1
+
+source /root/borg_env
+
+ARCHIVE=$($BORG list --short --glob-archives "$1_*" --last 1)
+[ -z "$ARCHIVE" ] && exit 0
+
+$DUMP="/tmp/$2.sql"
+$BORG extract "::$ARCHIVE" "$DUMP"
+/usr/bin/mariadb "$2" < "$DUMP"
+rm "$DUMP"
+
+if [ $# -gt 2 ]; then
+  if [ "$2" == "*" ]; then
+    $BORG extract "::$ARCHIVE"
+  else
+    $BORG extract "::$ARCHIVE" "$2"
+  fi
+fi

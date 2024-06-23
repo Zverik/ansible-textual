@@ -1,0 +1,51 @@
+---
+- name: Check out Level0
+  git:
+    repo: https://github.com/Zverik/Level0
+    dest: "{{ sites }}/osmz.ru/level0"
+
+- name: Run composer
+  community.general.composer:
+    command: install
+    working_dir: "{{ sites }}/osmz.ru/level0"
+
+- name: Upload config
+  template:
+    src: config.php
+    dest: "{{ sites }}/osmz.ru/level0/www/config.php"
+
+- name: Create data dir
+  become: yes
+  file:
+    path: "{{ sites }}/osmz.ru/level0/data"
+    state: directory
+    owner: www-data
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+  register: level0_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

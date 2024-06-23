@@ -1,0 +1,21 @@
+#!/bin/bash
+set -u -e
+[ "$(whoami)" != "root" ] && echo "Please run this script as a root" && exit 1
+BORG="$(which borg)"
+export BORG_REPO={{ borg_repo }}
+export BORG_PASSPHRASE='{{ borg_pass }}'
+export BORG_REMOTE_PATH=borg1
+export BORG_RSH='ssh -i /root/.ssh/borg -oBatchMode=yes'
+PREFIX=Tmp
+
+DBDUMP={{ database_backup }}
+/usr/bin/mysqldump --all-databases --single-transaction --quick --user=root '--password={{ mysql_root_password }}' | gzip > $DBDUMP
+
+$BORG create --one-file-system --compression zstd,5 ::"${PREFIX}_{now:%Y-%m-%d_%H%M}" \
+  --patterns-from /var/backup/include_exclude.lst \
+  $DBDUMP
+
+$BORG prune --prefix "${PREFIX}_" --keep-daily=7 --keep-weekly=3 --keep-monthly=3
+
+# Not deleting (yet) because it reserves space for the next backup
+# rm $DBDUMP

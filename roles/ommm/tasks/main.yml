@@ -1,0 +1,55 @@
+- name: Create directory for ommm
+  file:
+    path: "{{ sites }}/osmz.ru/ommm"
+    state: directory
+
+- name: Upload files for ommm
+  copy:
+    src: "{{ item }}"
+    dest: "{{ sites }}/osmz.ru/ommm"
+  with_fileglob: "ommm/*"
+  tags: [ ommm, update ]
+
+- name: Unpack tiles
+  unarchive:
+    src: ommm-tiles.tar
+    dest: "{{ sites }}/osmz.ru/ommm"
+    creates: "{{ sites }}/osmz.ru/ommm/ommm-tiles"
+
+- name: Create directory for presentations (not included)
+  file:
+    path: "{{ sites }}/osmz.ru/ommm/pres"
+    state: directory
+
+- name: Add presentations to backup
+  become: true
+  cron:
+    name: backup ommm
+    minute: 0
+    hour: 4
+    job: /root/make_backup OMMM "{{ sites }}/osmz.ru/ommm/pres"
+
+- name: Restore presentations from backup
+  when: "{{ 'restore' in ansible_run_tags }}"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - OMMM
+      - '*'
+    chdir: /
+
+- name: Upload ommm domain config
+  become: yes
+  template:
+    src: ommm.osmz.ru
+    dest: /etc/apache2/sites-available/ommm.osmz.ru.conf
+  notify: reload apache
+
+- name: Enable ommm domain config
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/ommm.osmz.ru.conf
+    dest: /etc/apache2/sites-enabled/ommm.osmz.ru.conf
+    state: link
+  notify: reload apache

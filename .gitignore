@@ -1,0 +1,8 @@
+.vault_pass
+.python-version
+*.swp
+roles.galaxy/
+yum*.lst
+.venv/
+__pycache__/
+old/

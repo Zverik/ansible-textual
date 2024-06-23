@@ -1,0 +1,3 @@
+---
+- name: reload apache
+  systemd: name=httpd state=reloaded

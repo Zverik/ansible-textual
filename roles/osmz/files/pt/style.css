@@ -1,0 +1,46 @@
+body {
+    font-family: "PT Sans", "Helvetica Heue", "Arial", sans-serif;
+    font-size: 18px;
+    background-color: #1a1a1a;
+    color: #ddd;
+    line-height: 1.5;
+    width: 100%;
+    margin: 0;
+}
+
+#content {
+    max-width: 700px;
+    margin: 1em auto;
+}
+
+p.high {
+    margin: 7em 0;
+}
+
+.button {
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    width: 500px;
+    margin: 2em auto;
+    background-size: 100%;
+}
+
+.button a {
+    display: block;
+    padding: 1em;
+    width: 100%;
+    color: #eee;
+    text-align: center;
+    text-decoration: none;
+    font-size: 26px;
+    font-weight: bold;
+    text-shadow: black 0 0 8px;
+}
+
+.see { background-image: linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(button-see.jpg); }
+.use { background-image: linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(button-use.png); }
+.map { background-image: linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(button-map.jpg); }
+
+a {
+    color: white;
+}

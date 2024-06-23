@@ -1,0 +1,21 @@
+# OSM User IDs
+USERS = {{ sisyphus_accounts | to_json }}
+
+# Where to send a mail in case processing a changeset fails
+FAIL_MAIL = '{{ admin_email }}'
+
+# Absolute path to sendmail binary
+SENDMAIL = '/usr/sbin/sendmail'
+
+# Delay in processing the changeset stream
+DELAY_MINUTES = 30
+
+# String for created_by changeset tag
+CREATED_BY = 'Sisyphus 1.0'
+
+# Filter out changesets based on a number of changes
+MAX_DIFFS = 50
+
+# Your OpenStreetMap credentials. DO NOT UPLOAD anywhere!
+OSM_USERNAME = "Zverik's Autoreverter"
+OSM_PASSWORD = '{{ osm_autoreverter_password }}'

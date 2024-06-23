@@ -1,0 +1,69 @@
+---
+- name: Create directory for osmz.ru
+  file:
+    path: "{{ sites }}/osmz.ru"
+    state: directory
+
+- name: Create osmz.ru/www
+  file:
+    path: "{{ sites }}/osmz.ru/www"
+    state: directory
+
+- name: Create osmz symlink
+  file:
+    path: "{{ ansible_env.HOME }}/osmz"
+    src: "{{ sites }}/osmz.ru"
+    state: link
+
+- name: Add osmz to backup
+  become: yes
+  cron:
+    name: backup osmz www
+    minute: 0
+    hour: 4
+    job: /root/make_backup Osmz "{{ sites }}/osmz.ru/www"
+
+- name: Restore osmz from backup
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - Osmz
+      - '*'
+    chdir: /
+
+- name: Upload simple domains
+  include_tasks: files.yml
+  tags: [ osmz, update ]
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/osmz.ru
+    state: directory
+    owner: www-data
+
+- name: Check that the osmz certificate exists
+  stat:
+    path: /etc/letsencrypt/certs/fullchain_osmz.ru.crt
+  register: osmz_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: osmz.ru
+    dest: /etc/apache2/sites-available/osmz.ru.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/osmz.ru.conf
+    dest: /etc/apache2/sites-enabled/osmz.ru.conf
+    state: link
+  notify: reload apache
+
+- name: Install yav2 job
+  when: false
+  include_tasks: yav2.yml

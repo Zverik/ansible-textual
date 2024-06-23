@@ -1,0 +1,6 @@
+#!/bin/bash
+DATE="$(/usr/bin/date +'%y%m%d')"
+TARGET={{ sites }}/osmz.ru/www/yav2
+/usr/bin/wget -q http://atd.openstreetmap.ru/posstat.html -O $TARGET/atd-$DATE.html
+# /usr/bin/wget -q --user-agent "googlebot" http://wowik.000space.com/places/index.php -O $TARGET/places-$DATE.html
+# /usr/bin/wget -q --user-agent "googlebot" http://wowik.000space.com/places/ru/index.php -O $TARGET/places-ru-$DATE.html

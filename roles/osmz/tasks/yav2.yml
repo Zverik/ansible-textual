@@ -1,0 +1,17 @@
+---
+- name: Upload yav2 script
+  template:
+    src: yav2
+    dest: /opt/src/yav2
+
+- name: Create yav2 directory if not exists
+  file:
+    path: "{{ sites }}/osmz.ru/www/yav2"
+    state: directory
+
+- name: Set up yav2 cron job
+  cron:
+    name: yav2
+    job: /opt/src/yav2
+    minute: 0
+    hour: 5
