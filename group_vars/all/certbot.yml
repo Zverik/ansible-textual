@@ -19,6 +19,7 @@ certbot_certs:
       - 2013.sotm-baltics.org
       - sotm-baltics.org
       - level0.osmz.ru
+      - revert.osmz.ru
 
 # Needed to add --expand
 certbot_create_command: >-

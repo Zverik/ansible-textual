@@ -11,7 +11,7 @@ DBNAME="$1"
 DUMP="/tmp/$DBNAME.sql"
 shift
 
-/usr/bin/mariadb-dump "$DBNAME" > "$DUMP"
+/usr/bin/mariadb-dump "$DBNAME" > "$DUMP" 2>/var/log/backup_db_errors.log
 
 $BORG create --compression zstd,5 ::"${PREFIX}_{now:%Y-%m-%d_%H%M}" "$DUMP" $@
 

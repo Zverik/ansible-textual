@@ -1,0 +1,17 @@
+[Unit]
+Description=RevertUI
+After=syslog.target
+
+[Service]
+Type=simple
+Restart=on-failure
+User=zverik
+Group=zverik
+WorkingDirectory={{ sites }}/osmz.ru/revert
+ExecStart={{ sites }}/osmz.ru/revert/.venv/bin/gunicorn -b 0.0.0.0:{{ revertui_port }} revertui.www:app
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/var/log/apache2/{{ domain }}/py-stdout.log
+StandardError=append:/var/log/apache2/{{ domain }}/py-stderr.log
+
+[Install]
+WantedBy=multi-user.target

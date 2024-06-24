@@ -1,0 +1,17 @@
+---
+- name: reload apache
+  become: yes
+  systemd: name=apache2 state=reloaded
+
+- name: restart revertui
+  become: yes
+  systemd:
+    name: revertui
+    state: restarted
+
+- name: drestart revertui
+  become: yes
+  systemd:
+    name: revertui
+    daemon_reload: true
+    state: restarted

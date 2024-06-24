@@ -1,5 +1,6 @@
-export BORG=/usr/local/bin/borg
+export BORG=/usr/bin/borg
 export BORG_REPO={{ borg_repo }}
 export BORG_PASSPHRASE='{{ borg_pass }}'
 export BORG_REMOTE_PATH=borg1
 export BORG_RSH='ssh -i /root/.ssh/borg -oBatchMode=yes'
+export BORG_LOGGING_CONF=/root/borg_logging.conf

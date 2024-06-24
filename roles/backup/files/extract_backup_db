@@ -10,7 +10,7 @@ ARCHIVE=$($BORG list --short --glob-archives "$1_*" --last 1)
 
 $DUMP="/tmp/$2.sql"
 $BORG extract "::$ARCHIVE" "$DUMP"
-/usr/bin/mariadb "$2" < "$DUMP"
+/usr/bin/mariadb "$2" < "$DUMP" 2>/var/log/backup_db_errors.log
 rm "$DUMP"
 
 if [ $# -gt 2 ]; then

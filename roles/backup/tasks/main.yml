@@ -13,6 +13,11 @@
     host: ch-s012.rsync.net
     key: "{{ rsync_key }}"
 
+- name: Upload borg logging config
+  copy:
+    src: borg_logging.conf
+    dest: /root/borg_logging.conf
+
 - name: Upload borg_env
   template:
     src: borg_env.j2
