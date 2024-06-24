@@ -31,9 +31,6 @@
 - hosts: all
   remote_user: "{{ admin }}"
   roles:
-    # zverev.info
-    - { role: zverev, tags: zverev }
-
     # textual.ru
     - { role: textual, tags: textual }
     - { role: not-textual, tags: not_textual }
@@ -56,6 +53,7 @@
     # - osmstreak
 
     # other
+    - { role: zverev, tags: zverev }
     - { role: josmru, tags: josmru }
     - { role: sotm-baltics, tags: sotm }
     # - sharemap

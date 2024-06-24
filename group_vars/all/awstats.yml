@@ -1,12 +1,12 @@
 awstats_sites:
+  - { domain: 'josm.ru' }
+  - { domain: 'zverev.info', aliases: 'REGEX[zverev\.info$]' }
+  - { domain: 'sotm-baltics.org', aliases: '2013.sotm-baltics.org' }
+
   - { domain: 'textual.ru', aliases: 'REGEX[textual\.ru$]' }
   - { domain: 'not.textual.ru' }
   - { domain: 'offsets.textual.ru' }
-  - { domain: 'photo.textual.ru' }
-  - { domain: 'osmz.ru', aliases: 'REGEX[osmz\.ru$]' }
-  - { domain: 'josm.ru' }
-  - { domain: 'share.mapbbcode.org' }
-  - { domain: 'pin-x.ru' }
-  - { domain: 'route.pin-x.ru' }
-  - { domain: 'shtosm.ru' }
-  - { domain: 'sotm-baltics.org', aliases: '2013.sotm-baltics.org' }
+  - { domain: 'pin-x.textual.ru', log_subdir: 'pin-x.ru' }
+
+  - { domain: 'level0.osmz.ru' }
+  - { domain: 'revert.osmz.ru' }

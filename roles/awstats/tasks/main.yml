@@ -5,7 +5,7 @@
     state: present
 
 - name: Create configuration files
-  copy:
+  template:
     src: awstats.model.conf
     dest: /etc/awstats/awstats.{{ item.domain }}.conf
   loop: "{{ awstats_sites }}"
@@ -33,5 +33,18 @@
     state: link
   notify: reload apache
 
-- name: Backups
-  import_tasks: backup.yml
+- name: Add awstats data to backup
+  cron:
+    name: backup awstats
+    minute: 0
+    hour: 4
+    job: /root/make_backup TextualAwStats /var/lib/awstats
+
+- name: Restore AWStats
+  when: "'restore' in ansible_run_tags"
+  command:
+    argv:
+      - "/root/extract_backup"
+      - TextualAwStats
+      - '*'
+    chdir: /
