@@ -1,0 +1,16 @@
+---
+- name: Add awstats data to backup
+  cron:
+    name: backup awstats
+    minute: 0
+    hour: 4
+    job: /root/make_backup TextualAwStats /var/lib/awstats
+
+- name: Restore AWStats
+  when: "{{ 'restore' in ansible_run_tags }}"
+  command:
+    argv:
+      - "/root/extract_backup"
+      - TextualAwStats
+      - '*'
+    chdir: /

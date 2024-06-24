@@ -42,3 +42,19 @@
     path: /var/log/apache2
     state: directory
     mode: 01777
+
+- name: Add certificate backups
+  cron:
+    name: backup certs
+    minute: 0
+    hour: 4
+    job: /root/make_backup TextualCert /etc/letsencrypt
+
+- name: Restore certificates
+  when: "'restore' in ansible_run_tags"
+  command:
+    argv:
+      - "/root/extract_backup"
+      - TextualCert
+      - '*'
+    chdir: /

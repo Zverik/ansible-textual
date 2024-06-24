@@ -1,0 +1,2 @@
+awstats_sites:
+  - { aw_domain: 'textual.ru', aw_aliases: 'REGEX[textual\.ru$]' }

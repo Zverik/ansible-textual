@@ -11,8 +11,8 @@
 
 {% if sotm_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.sotm }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.sotm }}/privkey.pem"
 {% endif %}
 
   <Directory {{ sites }}/sotm-baltics.org>

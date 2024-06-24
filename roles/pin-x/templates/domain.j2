@@ -11,8 +11,8 @@
 
 {% if pinx_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.pinx }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.pinx }}/privkey.pem"
 {% endif %}
 
   <Directory {{ sites }}/pin-x.ru>

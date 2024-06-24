@@ -11,8 +11,8 @@
 
 {% if josm_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.josm }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.josm }}/privkey.pem"
 {% endif %}
 
   <Directory {{ sites }}/{{ domain }}>

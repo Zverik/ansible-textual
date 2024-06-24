@@ -10,8 +10,8 @@
 
 {% if pma_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.pma }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.pma }}/privkey.pem"
 {% endif %}
 
   <Directory /usr/share/phpmyadmin>

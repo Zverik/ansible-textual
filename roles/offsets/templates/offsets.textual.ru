@@ -11,8 +11,8 @@
 
 {% if offsets_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.offsets }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.offsets }}/privkey.pem"
 {% endif %}
 
   <Directory {{ sites }}/{{ domain }}/www>

@@ -36,7 +36,7 @@
 - name: Check that the certificate exists
   become: yes
   stat:
-    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+    path: "{{ cert_path.sotm }}/privkey.pem"
   register: sotm_cert
 
 - name: Add apache domain

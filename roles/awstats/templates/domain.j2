@@ -1,0 +1,36 @@
+{% if aw_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+	ServerName awstats.textual.ru
+	DocumentRoot /usr/share/awstats/wwwroot
+
+  Alias /awstats /usr/share/awstats/wwwroot
+  Alias /awstatsclasses /usr/share/awstats/wwwroot/classes/
+  Alias /awstatscss /usr/share/awstats/wwwroot/css/
+  Alias /awstatsicons /usr/share/awstats/wwwroot/icon/
+  ScriptAlias /awstats-cgi/ /usr/share/awstats/wwwroot/cgi-bin/
+
+  CustomLog /var/log/apache2/awstats.textual.ru/access_log combined
+  ErrorLog /var/log/apache2/awstats.textual.ru/error_log
+
+{% if aw_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.awstats }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.awstats }}/privkey.pem"
+{% endif %}
+
+  <Directory /usr/share/awstats/wwwroot>
+      Require all granted
+      Options None
+      AllowOverride None
+  </Directory>
+</VirtualHost>
+
+{% if aw_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName awstats.textual.ru
+	Redirect permanent / https://awstats.textual.ru/
+</VirtualHost>
+{% endif %}

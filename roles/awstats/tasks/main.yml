@@ -1,0 +1,43 @@
+---
+- name: Install awstats
+  apt:
+    name: awstats
+    state: present
+
+- name: Create configuration files
+  copy:
+    src: awstats.model.conf
+    dest: /etc/awstats/awstats.{{ item.domain }}.conf
+  loop: "{{ awstats_sites }}"
+
+- name: Upload index.html
+  template:
+    src: index.html
+    dest: /usr/share/awstats/wwwroot/index.html
+
+- name: Upload cron job
+  when: false
+  template:
+    src: 00awstats
+    dest: /etc/cron.hourly/00awstats
+
+- name: Check that the certificate exists
+  stat:
+    path: "{{ cert_path.awstats }}/privkey.pem"
+  register: aw_cert
+
+- name: Add domain
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/awstats.textual.ru.conf
+  notify: reload apache
+
+- name: Enable domain
+  file:
+    src: /etc/apache2/sites-available/awstats.textual.ru.conf
+    dest: /etc/apache2/sites-enabled/awstats.textual.ru.conf
+    state: link
+  notify: reload apache
+
+- name: Backups
+  import_tasks: backup.yml

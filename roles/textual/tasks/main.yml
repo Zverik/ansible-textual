@@ -64,7 +64,7 @@
 - name: Check that the certificate exists
   become: yes
   stat:
-    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+    path: "{{ cert_path.textual }}/privkey.pem"
   register: textual_cert
 
 - name: Add apache domain

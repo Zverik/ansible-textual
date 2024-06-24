@@ -32,7 +32,7 @@
 - name: Check that the certificate exists
   become: yes
   stat:
-    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+    path: "{{ cert_path.level0 }}/privkey.pem"
   register: level0_cert
 
 - name: Add apache domain

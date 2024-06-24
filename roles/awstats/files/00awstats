@@ -1,0 +1,4 @@
+#!/bin/sh
+{% for site in awstats_sites %}
+/usr/share/awstats/wwwroot/cgi-bin/awstats.pl -config={{ site.domain }} -update
+{% endfor %}

@@ -11,8 +11,8 @@
 
 {% if textual_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ letsencrypt_cert_path }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ letsencrypt_cert_path }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.textual }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.textual }}/privkey.pem"
 {% endif %}
 
   <Directory {{ sites }}/{{ domain }}/www>

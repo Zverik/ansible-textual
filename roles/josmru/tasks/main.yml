@@ -49,7 +49,7 @@
 - name: Check that the certificate exists
   become: true
   stat:
-    path: "{{ letsencrypt_cert_path }}/privkey.pem"
+    path: "{{ cert_path.josm }}/privkey.pem"
   register: josm_cert
 
 - name: Upload domain config
