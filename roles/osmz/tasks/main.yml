@@ -35,7 +35,6 @@
 
 - name: Upload simple domains
   include_tasks: files.yml
-  tags: [ osmz, update ]
 
 - name: Create apache log directory
   become: yes
@@ -45,8 +44,9 @@
     owner: www-data
 
 - name: Check that the osmz certificate exists
+  become: yes
   stat:
-    path: /etc/letsencrypt/certs/fullchain_osmz.ru.crt
+    path: "{{ cert_path.osmz }}/privkey.pem"
   register: osmz_cert
 
 - name: Add apache domain

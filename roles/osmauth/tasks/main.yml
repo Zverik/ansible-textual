@@ -4,6 +4,11 @@
     repo: https://github.com/Zverik/osm-auth-proxy
     dest: "{{ sites }}/osmz.ru/auth"
 
+- name: Run composer
+  community.general.composer:
+    command: install
+    working_dir: "{{ sites }}/osmz.ru/auth"
+
 - name: Upload config.php
   template:
     src: config.php.j2

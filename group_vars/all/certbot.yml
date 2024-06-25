@@ -15,6 +15,7 @@ cert_path:
   awstats: /etc/letsencrypt/live/textual.ru
   seeing: /etc/letsencrypt/live/textual.ru
   osmz: /etc/letsencrypt/live/osmz.ru
+  ommm: /etc/letsencrypt/live/osmz.ru
   level0: /etc/letsencrypt/live/osmz.ru
   revert: /etc/letsencrypt/live/osmz.ru
   whosthat: /etc/letsencrypt/live/osmz.ru
@@ -42,6 +43,10 @@ certbot_certs:
       - osmz.ru
       - level0.osmz.ru
       - revert.osmz.ru
+      - radio.osmz.ru
+      - auth.osmz.ru
+      - whosthat.osmz.ru
+      - ommm.osmz.ru
 
 # Needed to add --expand
 certbot_create_command: >-

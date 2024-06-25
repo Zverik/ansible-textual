@@ -70,37 +70,32 @@
 
 # Finally the osmz directory
 
+{% if osmz_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
 <VirtualHost *:80>
+{% endif %}
 	ServerName osmz.ru
 	DocumentRoot {{ sites }}/osmz.ru/www
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
 
+{% if osmz_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.osmz }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.osmz }}/privkey.pem"
+{% endif %}
+
 	<Directory {{ sites }}/osmz.ru/www>
 		Options ExecCGI Indexes FollowSymLinks Includes MultiViews
 		AllowOverride All
 	</Directory>
-</VirtualHost>
-
-<VirtualHost *:80>
-	ServerName www.osmz.ru
-	Redirect permanent / http://osmz.ru/
 </VirtualHost>
 
 {% if osmz_cert.stat.exists %}
-<VirtualHost *:443>
+<VirtualHost *:80>
 	ServerName osmz.ru
-	DocumentRoot {{ sites }}/osmz.ru/www
-	CustomLog /var/log/apache2/osmz.ru/access_log combined
-	ErrorLog /var/log/apache2/osmz.ru/error_log
-
-  SSLEngine on
-  SSLCertificateFile "/etc/letsencrypt/certs/fullchain_osmz.ru.crt"
-  SSLCertificateKeyFile "/etc/letsencrypt/keys/osmz.ru.key"
-
-	<Directory {{ sites }}/osmz.ru/www>
-		Options ExecCGI Indexes FollowSymLinks Includes MultiViews
-		AllowOverride All
-	</Directory>
+	ServerAlias www.osmz.ru
+	Redirect permanent / https://osmz.ru/
 </VirtualHost>
 {% endif %}
