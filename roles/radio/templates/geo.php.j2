@@ -1,0 +1,59 @@
+<?php
+$login = '{{ radio_icecast_login }}';
+$password = '{{ radio_icecast_password }}';
+$mount = '/osmru';
+$server = '{{ radio_icecast_domain}}:8000';
+$url = "http://$server/admin/listclients?mount=$mount";
+$opts = array('http' => array(
+	'method' => 'GET',
+	'header' => 'Authorization: Basic '.base64_encode("$login:$password")."\r\n"
+));
+$context = stream_context_create($opts);
+$xml = @file_get_contents($url, false, $context);
+if( !$xml ) {
+	echo "<p>Sorry, no mountpoint found.</p>\n";
+	exit();
+}
+$listeners = new SimpleXMLElement($xml);
+$unknown = 'Unknown';
+$bycity = array();
+$bycountry = array();
+foreach( $listeners->source->listener as $listener ) {
+	$l = array();
+	$l['ip'] = (string)$listener->IP;
+	$l['time'] = (string)$listener->Connected;
+	if( geoip_db_avail(GEOIP_COUNTRY_EDITION) )
+	    $l['country'] = geoip_country_name_by_name($l['ip']);	
+	$geo = @geoip_record_by_name($l['ip']);
+	if( $geo && isset($geo['country_name']) && strlen($geo['country_name']) > 0 )
+		$l['country'] = $geo['country_name'];
+	if( $geo && isset($geo['city']) && strlen($geo['city']) > 0 )
+		$l['city'] = $geo['city'];
+
+	$country = isset($l['country']) ? $l['country'] : $unknown;
+	if( isset($bycountry[$country]) )
+		$bycountry[$country]++;
+	else
+		$bycountry[$country] = 1;
+
+	if( isset($l['city']) ) {
+		$city = $l['city'].', '.$country;
+		if( isset($bycity[$city]) )
+			$bycity[$city]++;
+		else
+			$bycity[$city] = 1;
+	}
+}
+
+echo '<meta http-equiv="refresh" content="10">';
+echo "<h1>Geo Statistics for $mount</h1>";
+arsort($bycountry);
+echo '<p>By country:</p>';
+foreach( $bycountry as $c => $v )
+	echo "$c: $v<br>";
+
+arsort($bycity);
+echo '<p>By city:</p>';
+foreach( $bycity as $c => $v )
+	echo "$c: $v<br>";
+?>

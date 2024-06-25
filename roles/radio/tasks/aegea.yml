@@ -9,8 +9,9 @@
 - name: Create podcasts directory
   become: yes
   file:
-    path: "{{ path }}/podcasts"
+    path: "{{ path }}/podcast"
     state: directory
+    owner: zverik
 
 - name: Check that we haven't unpacked aegea
   stat:
