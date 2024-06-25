@@ -1,0 +1,30 @@
+{% if whosthat_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  DocumentRoot {{ sites }}/osmz.ru/whosthat/www
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if whosthat_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.whosthat }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.whosthat }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/osmz.ru/whosthat/www>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if whosthat_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}

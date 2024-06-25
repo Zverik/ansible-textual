@@ -1,0 +1,105 @@
+---
+- name: Check out whosthat
+  git:
+    repo: https://github.com/Zverik/whosthat
+    dest: "{{ sites }}/osmz.ru/whosthat"
+
+- name: Upload config.php
+  template:
+    src: config.php.j2
+    dest: "{{ sites }}/osmz.ru/whosthat/www/config.php"
+
+- name: Create whosthat mysql db
+  become: true
+  mysql_db:
+    name: "{{ whosthat_mysql_db }}"
+    state: present
+  register: create_db
+
+- name: Create whosthat mysql user
+  become: true
+  mysql_user:
+    name: "{{ whosthat_mysql_user }}"
+    password: "{{ whosthat_mysql_password }}"
+    priv: "{{ whosthat_mysql_db }}.*:ALL"
+
+- name: Initialize log file
+  become: yes
+  file:
+    path: /var/log/whosthat.log
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+    owner: "{{ admin }}"
+
+- name: Create mysql table
+  when: create_db is changed
+  become: yes
+  mysql_db:
+    name: "{{ whosthat_mysql_db }}"
+    login_user: "{{ whosthat_mysql_user }}"
+    login_password: "{{ whosthat_mysql_password }}"
+    state: import
+    target: "{{ sites }}/osmz.ru/whosthat/scripts/create_table.sql"
+
+- name: Install cpanm for perl modules
+  become: yes
+  apt:
+    name:
+      - liblwp-protocol-https-perl
+      - libdbix-simple-perl
+    state: present
+
+- name: Upload whosthat updater
+  become: yes
+  template:
+    src: update_whosthat
+    dest: /etc/cron.hourly
+    mode: 0755
+
+- name: Add whosthat to backup
+  become: yes
+  cron:
+    name: backup whosthat
+    minute: 0
+    hour: 4
+    job: /root/make_backup_db WhosThat {{ whosthat_mysql_db }}
+
+- name: Restore whosthat
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup_db"
+      - WhosThat
+      - "{{ whosthat_mysql_db }}"
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.whosthat }}/privkey.pem"
+  register: whosthat_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

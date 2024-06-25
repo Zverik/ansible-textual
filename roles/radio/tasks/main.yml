@@ -2,22 +2,22 @@
 - name: Install or update aegea
   import_tasks: aegea.yml
   vars:
-    aegea_version: "{{ seen_aegea_version }}"
-    path: "{{ sites }}/{{ domain }}"
-    theme_name: seeing
+    aegea_version: "{{ radio_aegea_version }}"
+    path: "{{ sites }}/osmz.ru/radio"
+    theme_name: radioosmru
 
-- name: Create seen mysql db
+- name: Create radio mysql db
   become: true
   mysql_db:
-    name: "{{ seen_mysql_db }}"
+    name: "{{ radio_mysql_db }}"
     state: present
 
-- name: Create seen mysql user
+- name: Create radio mysql user
   become: true
   mysql_user:
-    name: "{{ seen_mysql_user }}"
-    password: "{{ seen_mysql_password }}"
-    priv: "{{ seen_mysql_db }}.*:ALL"
+    name: "{{ radio_mysql_user }}"
+    password: "{{ radio_mysql_password }}"
+    priv: "{{ radio_mysql_db }}.*:ALL"
 
 - name: Enable apache mod_rewrite
   become: yes
@@ -26,22 +26,22 @@
     state: present
   notify: restart apache
 
-- name: Add seeing to backup
+- name: Add radio to backup
   become: yes
   cron:
-    name: backup seen
+    name: backup radio
     minute: 0
     hour: 4
-    job: /root/make_backup_db Seeing {{ seen_mysql_db }} "{{ sites }}/{{ domain }}/user" "{{ sites }}/{{ domain }}/pictures"
+    job: /root/make_backup_db Radio {{ radio_mysql_db }} "{{ sites }}/osmz.ru/radio/user" "{{ sites }}/osmz.ru/radio/pictures" "{{ sites }}/osmz.ru/radio/podcast"
 
-- name: Restore seeing
+- name: Restore radio
   when: "'restore' in ansible_run_tags"
   become: yes
   command:
     argv:
       - "/root/extract_backup_db"
-      - Seeing
-      - "{{ seen_mysql_db }}"
+      - Radio
+      - "{{ radio_mysql_db }}"
       - '*'
     chdir: /
 
@@ -56,8 +56,8 @@
 - name: Check that the certificate exists
   become: yes
   stat:
-    path: "{{ cert_path.seeing }}/privkey.pem"
-  register: seeing_cert
+    path: "{{ cert_path.radio }}/privkey.pem"
+  register: radio_cert
 
 - name: Add apache domain
   become: yes

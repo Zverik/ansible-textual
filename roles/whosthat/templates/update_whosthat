@@ -1,0 +1,9 @@
+#!/bin/sh
+vdir={{ sites }}/osmz.ru/whosthat/scripts
+logfile=/var/log/whosthat.log
+export PERL5LIB=/home/{{ admin }}/perl5/lib/perl5
+
+$vdir/parse_osc.pl \
+  -d {{ whosthat_mysql_db }} -u {{ whosthat_mysql_user }} -p "{{ whosthat_mysql_password }}" \
+  -l https://planet.openstreetmap.org/replication/hour \
+  -s $vdir/state.txt -w /usr/bin/wget -v 2>>$logfile

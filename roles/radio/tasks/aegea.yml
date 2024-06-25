@@ -1,0 +1,131 @@
+---
+- name: Create aegea directory
+  become: yes
+  file:
+    path: "{{ path }}"
+    state: directory
+    owner: www-data
+
+- name: Create podcasts directory
+  become: yes
+  file:
+    path: "{{ path }}/podcasts"
+    state: directory
+
+- name: Check that we haven't unpacked aegea
+  stat:
+    path: "{{ path }}/index.php"
+  register: aegea_index
+
+- name: Read the installed version
+  when: aegea_index.stat.exists
+  slurp:
+    src: "{{ path }}/user/version"
+  failed_when: false
+  register: version64
+
+- name: Parse the installed version
+  when: version64.content is defined
+  set_fact:
+    aegea_server_version: "{{ version64.content | b64decode | trim }}"
+
+- name: Alternatively, set installed version to a dummy
+  when: aegea_server_version is not defined
+  set_fact:
+    aegea_server_version: old
+
+- name: Set is_updating var
+  set_fact:
+    aegea_updating: "{{ aegea_index.stat.exists and aegea_server_version != aegea_version }}"
+
+- name: Install unzip
+  when: aegea_server_version != aegea_version
+  become: yes
+  apt:
+    name: unzip
+    state: present
+
+- name: Just in case, cleanup temporary files
+  when: aegea_server_version != aegea_version
+  file:
+    path: /tmp/aegea
+    state: absent
+
+- name: Create tmp dir for aegea
+  when: aegea_server_version != aegea_version
+  file:
+    path: /tmp/aegea
+    state: directory
+
+- name: Download aegea
+  when: aegea_server_version != aegea_version
+  get_url:
+    url: "https://blogengine.ru/download/e2_distr_v{{ aegea_version }}.zip"
+    dest: /tmp/aegea/aegea.zip
+
+- name: Unzip aegea
+  when: aegea_server_version != aegea_version
+  unarchive:
+    src: /tmp/aegea/aegea.zip
+    dest: /tmp/aegea
+    remote_src: true
+
+- name: Copy aegea anew
+  when: not aegea_index.stat.exists
+  become: yes
+  copy:
+    src: /tmp/aegea/
+    dest: "{{ path }}"
+    owner: www-data
+    remote_src: true
+
+- name: Clean old files
+  when: aegea_updating
+  become: yes
+  file:
+    path: "{{ path }}/{{ item }}"
+    state: absent
+  loop:
+    - .htaccess
+    - system
+    - themes
+
+- name: Copy new files
+  when: aegea_updating
+  become: yes
+  copy:
+    src: /tmp/aegea/{{ item }}
+    dest: "{{ path }}/"
+    owner: www-data
+    remote_src: true
+  loop:
+    - .htaccess
+    - system
+
+- name: Delete temporary aegea files
+  file:
+    path: /tmp/aegea
+    state: absent
+
+- name: Write installed version
+  when: aegea_server_version != aegea_version
+  become: yes
+  copy:
+    content: "{{ aegea_version }}"
+    dest: "{{ path }}/user/version"
+    force: yes
+
+- name: Upload theme
+  become: yes
+  copy:
+    src: theme/
+    dest: "{{ path }}/user/themes/{{ theme_name }}"
+    owner: www-data
+
+- name: Upload settings.json
+  become: yes
+  template:
+    src: settings.json.j2
+    dest: "{{ path }}/user/settings.json"
+    owner: www-data
+    force: false

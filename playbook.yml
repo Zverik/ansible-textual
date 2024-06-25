@@ -43,13 +43,12 @@
     - { role: ommm, tags: ommm }
     - { role: level0, tags: level0 }
     - { role: revertui, tags: revertui }
-    # - whosthat
+    - { role: radio, tags: radio }
+    - { role: whosthat, tags: whosthat }
+    - { role: osmauth, tags: osmauth }
     # - bigmap2
-    # - osmauth
     # - cf_audit
-    # - osmvoting
-    # - radio
-    # - vakhtyor
+    # - awards
     # - osmstreak
 
     # other

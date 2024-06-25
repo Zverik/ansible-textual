@@ -1,0 +1,6 @@
+---
+# radio_aegea_version: "3254"
+radio_aegea_version: "4134"
+radio_mysql_db: radio
+radio_mysql_user: radio
+radio_mysql_password: ""

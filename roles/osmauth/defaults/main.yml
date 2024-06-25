@@ -1,0 +1,6 @@
+---
+osmauth_client_id: ""
+osmauth_client_secret: ""
+osmauth_mysql_db: osmauth
+osmauth_mysql_user: osmauth
+osmauth_mysql_password: ""

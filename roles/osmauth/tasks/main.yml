@@ -1,0 +1,78 @@
+---
+- name: Check out osmauth
+  git:
+    repo: https://github.com/Zverik/osm-auth-proxy
+    dest: "{{ sites }}/osmz.ru/auth"
+
+- name: Upload config.php
+  template:
+    src: config.php.j2
+    dest: "{{ sites }}/osmz.ru/auth/www/config.php"
+
+- name: Create osmauth mysql db
+  become: true
+  mysql_db:
+    name: "{{ osmauth_mysql_db }}"
+    state: present
+  register: create_db
+
+- name: Create osmauth mysql user
+  become: true
+  mysql_user:
+    name: "{{ osmauth_mysql_user }}"
+    password: "{{ osmauth_mysql_password }}"
+    priv: "{{ osmauth_mysql_db }}.*:ALL"
+
+- name: Create mysql table
+  when: create_db is changed
+  command:
+    argv:
+      - /usr/bin/php
+      - "{{ sites }}/osmz.ru/auth/scripts/createdb.php"
+
+- name: Add osmauth to backup
+  become: yes
+  cron:
+    name: backup osmauth
+    minute: 0
+    hour: 4
+    job: /root/make_backup_db OsmAuth {{ osmauth_mysql_db }}
+
+- name: Restore osmauth
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup_db"
+      - OsmAuth
+      - "{{ osmauth_mysql_db }}"
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.auth }}/privkey.pem"
+  register: auth_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

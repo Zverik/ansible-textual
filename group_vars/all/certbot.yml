@@ -17,6 +17,9 @@ cert_path:
   osmz: /etc/letsencrypt/live/osmz.ru
   level0: /etc/letsencrypt/live/osmz.ru
   revert: /etc/letsencrypt/live/osmz.ru
+  whosthat: /etc/letsencrypt/live/osmz.ru
+  radio: /etc/letsencrypt/live/osmz.ru
+  auth: /etc/letsencrypt/live/osmz.ru
 
 certbot_certs:
   - email: ilya@zverev.info

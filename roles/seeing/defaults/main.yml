@@ -1,5 +1,6 @@
 ---
-# aegea_version: "3254"
-aegea_version: "4134"
+# seen_aegea_version: "3254"
+seen_aegea_version: "4134"
 seen_mysql_db: seen
 seen_mysql_user: seeing
+seen_mysql_password: ""

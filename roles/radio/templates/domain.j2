@@ -1,0 +1,30 @@
+{% if radio_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  DocumentRoot {{ sites }}/osmz.ru/radio
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if radio_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.radio }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.radio }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/osmz.ru/radio>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if radio_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}
