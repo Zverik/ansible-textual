@@ -1,6 +1,10 @@
 :root {
+    --blogTitleFontSize: 16px;
+    --blogTitleLineHeight: 24px;
     --noteTitleFontSize: 16px;
     --noteTitleLineHeight: 1.2;
+    --noteTextFontSize: 16px;
+    --noteTextLineHeight: 24px;
 }
 
 .title {

@@ -1,3 +1,5 @@
+<?php _X ('common-pre') ?>
+
 <div class="common">
 
 
@@ -19,17 +21,19 @@
 
         </div>
 
-        <div id="e2-blog-description"><?= $content['blog']['description'] ?></div>
+        <div id="e2-blog-description"><?= $content['blog']['subtitle'] ?></div>
       </div>
     </div>
 
     <div class="spotlight">
-      <span class="admin-links admin-links-floating">
+      <?php #_T_DEFER ('stat') ?>
+
+      <span class="admin-links-floating">
         <?php _T ('author-menu') ?>
       </span>
 
       <?php if ($content['class'] != 'found') { ?>
-        <?php _T_FOR ('search') ?>
+        <?php _T ('search-icon') ?>
       <?php } ?>
 
       <div>
@@ -40,6 +44,8 @@
 
   </div>
 
+  <?php _T ('main-menu') ?>
+
   <?php _X ('header-post') ?>
 </div>
 
@@ -48,18 +54,18 @@
 <div class="content">
 
 <?php _T ('heading') ?>
-<?php _T ('theme-preview') ?>
 <?php _T ('message') ?>
 <?php _T ('welcome') ?>
-<?php _T ('drafts') ?>
+<?php _T ('unavailable') ?>
 <?php _T ('notes') ?>
 <?php _T ('notes-list') ?>
 <?php _T ('tags') ?>
 <?php _T ('nothing') ?>
 <?php _T ('sessions') ?>
+<?php _T ('sources') ?>
 <?php _T ('pages') ?>
 <?php _T ('comments') ?>
-<?php _T ('tags-menu') ?>
+<?php _T ('popular') ?>
 <?php _T ('unsubscribe') ?>
 <?php _T ('form') ?>
 
@@ -74,13 +80,9 @@
 
 <a class="e2-rss-button" href="<?=@$content['blog']['rss-href']?>"><?= _S ('gs--rss') ?></a>
 
-<?php # please do not remove: #?>
 <div class="engine">
-<?= $content['engine']['about'] ?>
-<?php if ($content['sign-in']['done?']) { ?>
-&nbsp;&nbsp;&nbsp;
-<span title="<?= _S ('gs--pgt') ?>"><?=$content['engine']['pgt']?> <?= _S ('gs--seconds-contraction') ?></span>
-<?php } ?>
+<?= $content['engine']['about'] # please do not remove ?>
+<?php _T_DEFER ('stat') ?>
 </div>
 
 <?php _T ('login-element'); ?>
@@ -92,3 +94,5 @@
 
 
 </div>
+
+<?php _T ('niceerror'); ?>

@@ -113,7 +113,7 @@
   become: yes
   copy:
     src: theme/
-    dest: "{{ sites }}/{{ domain }}/themes/seeing"
+    dest: "{{ sites }}/{{ domain }}/user/themes/seeing"
     owner: www-data
 
 - name: Upload config
