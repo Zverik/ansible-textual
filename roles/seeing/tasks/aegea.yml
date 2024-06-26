@@ -73,6 +73,13 @@
     owner: www-data
     remote_src: true
 
+- name: Delete zip file
+  when: not aegea_index.stat.exists
+  become: yes
+  file:
+    path: "{{ path }}/aegea.zip"
+    state: absent
+
 - name: Clean old files
   when: aegea_updating
   become: yes

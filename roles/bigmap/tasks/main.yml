@@ -1,0 +1,75 @@
+---
+- name: Check out bigmap2
+  git:
+    repo: https://github.com/Zverik/bigmap2.git
+    dest: "{{ sites }}/osmz.ru/bigmap"
+
+- name: Create directories
+  file:
+    path: "{{ sites }}/osmz.ru/bigmap/{{ item[0] }}"
+    state: directory
+    mode: "{{ item[1] }}"
+  loop:
+    - [ 'queue', '0777' ]
+    - [ 'queue/tasks', '0777' ]
+    - [ 'www/result', '0777' ]
+
+- name: Create empty queue
+  file:
+    path: "{{ sites }}/osmz.ru/bigmap/queue/queue"
+    state: touch
+    mode: 0666
+    access_time: preserve
+    modification_time: preserve
+
+- name: Install perl modules
+  become: yes
+  apt:
+    name:
+      - liblwp-protocol-https-perl
+      - libgd-perl
+    state: present
+
+- name: Add purge_images to cron
+  cron:
+    name: bigmap_purge
+    state: present
+    job: "{{ sites }}/osmz.ru/bigmap/scripts/purge_images.pl"
+    minute: "2"
+    hour: "*/6"
+
+- name: Add bigmap_download to cron
+  cron:
+    name: bigmap_download
+    state: present
+    job: "{{ sites }}/osmz.ru/bigmap/scripts/bigmap_download.pl"
+    minute: "*/2"
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.bigmap }}/privkey.pem"
+  register: bigmap_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

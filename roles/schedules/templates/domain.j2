@@ -1,0 +1,30 @@
+{% if schedules_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  DocumentRoot {{ sites }}/{{ domain }}
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if schedules_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.schedules }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.schedules }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/{{ domain }}>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if schedules_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}

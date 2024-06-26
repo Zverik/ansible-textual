@@ -46,7 +46,8 @@
     - { role: radio, tags: radio }
     - { role: whosthat, tags: whosthat }
     - { role: osmauth, tags: osmauth }
-    # - bigmap2
+    - { role: bigmap, tags: bigmap }
+    - { role: schedules, tags: sotm }
     # - cf_audit
     # - awards
     # - osmstreak
@@ -54,7 +55,7 @@
     # other
     - { role: zverev, tags: zverev }
     - { role: josmru, tags: josmru }
-    - { role: sotm-baltics, tags: sotm }
+    - { role: sotm-baltics, tags: sotmb }
     # - sharemap
     # - shtosm
     # - shtosm-twitter

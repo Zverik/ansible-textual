@@ -6,13 +6,6 @@
     state: directory
     owner: www-data
 
-- name: Create podcasts directory
-  become: yes
-  file:
-    path: "{{ path }}/podcast"
-    state: directory
-    owner: zverik
-
 - name: Check that we haven't unpacked aegea
   stat:
     path: "{{ path }}/index.php"

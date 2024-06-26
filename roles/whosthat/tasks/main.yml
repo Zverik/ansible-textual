@@ -42,7 +42,7 @@
     state: import
     target: "{{ sites }}/osmz.ru/whosthat/scripts/create_table.sql"
 
-- name: Install cpanm for perl modules
+- name: Install perl modules
   become: yes
   apt:
     name:

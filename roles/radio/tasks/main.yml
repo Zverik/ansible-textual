@@ -6,6 +6,13 @@
     path: "{{ sites }}/osmz.ru/radio"
     theme_name: radioosmru
 
+- name: Create podcasts directory
+  become: yes
+  file:
+    path: "{{ sites }}/osmz.ru/radio/podcast"
+    state: directory
+    owner: zverik
+
 - name: Create radio mysql db
   become: true
   mysql_db:

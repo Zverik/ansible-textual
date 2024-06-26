@@ -1,0 +1,36 @@
+---
+- name: Checkout schedules repo
+  git:
+    repo: https://github.com/Zverik/schedule-convert.git
+    dest: /opt/src/schedule-convert
+  register: git_updated
+
+- name: Install lxml
+  become: yes
+  apt: name=python3-lxml
+
+- name: Create virtualenv
+  pip:
+    name: /opt/src/schedule-convert
+    state: latest
+    virtualenv: /opt/src/schedule-convert/.venv
+    virtualenv_site_packages: yes
+
+- name: Create www/sotm directory
+  become: yes
+  file:
+    path: "{{ sites }}/{{ domain }}"
+    state: directory
+    owner: zverik
+
+- name: Upload static files to www
+  copy:
+    src: index.html
+    dest: "{{ sites }}/{{domain}}"
+
+- name: Set up schedule updater
+  import_tasks: updater.yml
+
+- name: Set up apache config
+  become: yes
+  import_tasks: apache.yml

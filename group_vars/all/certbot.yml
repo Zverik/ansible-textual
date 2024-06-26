@@ -21,6 +21,10 @@ cert_path:
   whosthat: /etc/letsencrypt/live/osmz.ru
   radio: /etc/letsencrypt/live/osmz.ru
   auth: /etc/letsencrypt/live/osmz.ru
+  bigmap: /etc/letsencrypt/live/osmz.ru
+  audit: /etc/letsencrypt/live/osmz.ru
+  awards: /etc/letsencrypt/live/osmz.ru
+  schedules: /etc/letsencrypt/live/osmz.ru
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -47,6 +51,10 @@ certbot_certs:
       - auth.osmz.ru
       - whosthat.osmz.ru
       - ommm.osmz.ru
+      - bigmap.osmz.ru
+      - audit.osmz.ru
+      - awards.osmz.ru
+      - sotm.osmz.ru
 
 # Needed to add --expand
 certbot_create_command: >-
