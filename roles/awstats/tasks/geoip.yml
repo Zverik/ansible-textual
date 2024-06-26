@@ -1,0 +1,42 @@
+---
+- name: Add geoipupdate repository
+  apt_repository:
+    repo: 'ppa:maxmind/ppa'
+
+- name: Install geoipupdate
+  apt:
+    update_cache: yes
+    name: geoipupdate
+    state: latest
+
+- name: Upload GeoIP config
+  become: yes
+  template:
+    src: geoip.conf.j2
+    dest: /etc/GeoIP.conf
+
+- name: Just in case, add mailto to the top of crontab
+  become: yes
+  cron:
+    name: MAILTO
+    env: yes
+    job: "{{ admin_email }}"
+
+- name: Add GeoIPUpdate to cron
+  become: yes
+  cron:
+    name: geoipupdate
+    job: /usr/bin/geoipupdate
+    minute: 0
+    hour: 4
+    weekday: 3,6
+
+- name: Check that geoip files were downloaded
+  stat:
+    path: /usr/share/GeoIP/GeoLite2-Country.mmdb
+  register: geoipup
+
+- name: Run GeoIPUpdate once
+  when: not geoipup.stat.exists
+  become: yes
+  command: /usr/bin/geoipupdate

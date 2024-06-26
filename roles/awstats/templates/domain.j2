@@ -4,13 +4,12 @@
 <VirtualHost *:80>
 {% endif %}
 	ServerName awstats.textual.ru
-	DocumentRoot /usr/share/awstats/wwwroot
+	DocumentRoot /var/cache/awstats
 
-  Alias /awstats /usr/share/awstats/wwwroot
-  Alias /awstatsclasses /usr/share/awstats/wwwroot/classes/
-  Alias /awstatscss /usr/share/awstats/wwwroot/css/
-  Alias /awstatsicons /usr/share/awstats/wwwroot/icon/
-  ScriptAlias /awstats-cgi/ /usr/share/awstats/wwwroot/cgi-bin/
+  Alias /awstatsclasses /usr/share/awstats/lib/
+  Alias /awstatscss /usr/share/doc/awstats/examples/css/
+  Alias /icons /usr/share/awstats/icon/
+  ScriptAlias /awstats-cgi/ /usr/lib/cgi-bin/
 
   CustomLog /var/log/apache2/awstats.textual.ru/access_log combined
   ErrorLog /var/log/apache2/awstats.textual.ru/error_log
@@ -21,10 +20,19 @@
   SSLCertificateKeyFile "{{ cert_path.awstats }}/privkey.pem"
 {% endif %}
 
-  <Directory /usr/share/awstats/wwwroot>
-      Require all granted
-      Options None
-      AllowOverride None
+  <Directory /var/cache/awstats>
+    Require all granted
+    Options None
+    AllowOverride None
+  </Directory>
+
+  <Directory /usr/lib/cgi-bin>
+    AuthType Basic
+    AuthName "Sorry"
+    AuthUserFile /etc/apache2/.awpasswd
+    Require valid-user
+    Options FollowSymLinks Includes MultiViews ExecCGI
+    AllowOverride None
   </Directory>
 </VirtualHost>
 

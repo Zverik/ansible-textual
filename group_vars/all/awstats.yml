@@ -7,6 +7,12 @@ awstats_sites:
   - { domain: 'not.textual.ru' }
   - { domain: 'offsets.textual.ru' }
   - { domain: 'pin-x.textual.ru', log_subdir: 'pin-x.ru' }
+  - { domain: 'seen.textual.ru' }
 
+  - { domain: 'osmz.ru' }
   - { domain: 'level0.osmz.ru' }
   - { domain: 'revert.osmz.ru' }
+  - { domain: 'radio.osmz.ru' }
+  - { domain: 'whosthat.osmz.ru' }
+  - { domain: 'bigmap.osmz.ru' }
+  - { domain: 'sotm.osmz.ru' }

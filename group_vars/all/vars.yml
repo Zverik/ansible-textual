@@ -19,6 +19,7 @@ phpmyadmin_user_password: "{{ v_phpmyadmin_user_password }}"
 
 maxmind_account: "{{ v_maxmind_account }}"
 maxmind_license: "{{ v_maxmind_license }}"
+awstats_password: "{{ v_awstats_password }}"
 
 osm_autoreverter_password: "{{ v_osm_autoreverter_password }}"
 

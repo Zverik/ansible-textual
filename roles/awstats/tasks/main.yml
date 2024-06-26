@@ -10,12 +10,56 @@
     dest: /etc/awstats/awstats.{{ item.domain }}.conf
   loop: "{{ awstats_sites }}"
 
+- name: Create data directories
+  file:
+    path: /var/lib/awstats/{{ item.domain }}
+    state: directory
+    owner: www-data
+    mode: '0755'
+  loop: "{{ awstats_sites }}"
+
 - name: Upload index.html
   template:
     src: index.html.j2
-    dest: /usr/share/awstats/wwwroot/index.html
+    dest: /var/cache/awstats/index.html
+
+- name: Upload robots.txt
+  copy:
+    src: robots.txt
+    dest: /var/cache/awstats/robots.txt
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/awstats.textual.ru"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: This next one requires passlib
+  become: yes
+  apt:
+    name: python3-passlib
+    state: present
+
+- name: Insert awstats password
+  become: yes
+  community.general.htpasswd:
+    path: /etc/apache2/.awpasswd
+    name: zverik
+    password: "{{ awstats_password }}"
+    owner: www-data
+    mode: '0600'
+
+- name: Enable apache mod_cgi
+  become: yes
+  apache2_module:
+    name: cgi
+    state: present
+  notify: restart apache
 
 - name: Check that the certificate exists
+  become: yes
   stat:
     path: "{{ cert_path.awstats }}/privkey.pem"
   register: aw_cert
@@ -48,3 +92,7 @@
       - TextualAwStats
       - '*'
     chdir: /
+
+- name: Set up geoip databases
+  when: false # does not work for now
+  import_tasks: geoip.yml
