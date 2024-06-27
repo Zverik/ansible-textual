@@ -40,14 +40,14 @@
   become: yes
   template:
     src: iodb_backup.sh
-    dest: /etc/cron.daily/iodb_backup.sh
+    dest: /etc/cron.daily/iodb_backup
     mode: '0755'
 
 - name: Upload downloads pruning script
   become: yes
   template:
     src: prune_archive.sh
-    dest: /etc/cron.monthly/iodb_prune.sh
+    dest: /etc/cron.monthly/iodb_prune
     mode: '0755'
 
 - name: Add iodb to backup

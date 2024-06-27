@@ -25,6 +25,7 @@ cert_path:
   audit: /etc/letsencrypt/live/osmz.ru
   awards: /etc/letsencrypt/live/osmz.ru
   schedules: /etc/letsencrypt/live/osmz.ru
+  streak: /etc/letsencrypt/live/osmz.ru
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -55,6 +56,7 @@ certbot_certs:
       - audit.osmz.ru
       - awards.osmz.ru
       - sotm.osmz.ru
+      - streak.osmz.ru
 
 # Needed to add --expand
 certbot_create_command: >-

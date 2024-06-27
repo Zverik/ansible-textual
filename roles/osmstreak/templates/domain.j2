@@ -1,0 +1,27 @@
+{% if streak_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  ServerAlias streak2.osmz.ru
+
+  ProxyPass / http://localhost:{{ osmstreak_port }}/
+  ProxyPassReverse / http://localhost:{{ osmstreak_port }}/
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if streak_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.streak }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.streak }}/privkey.pem"
+{% endif %}
+</VirtualHost>
+
+{% if streak_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}

@@ -1,0 +1,17 @@
+---
+- name: reload apache
+  become: yes
+  systemd: name=apache2 state=reloaded
+
+- name: restart osmstreak
+  become: yes
+  systemd:
+    name: osmstreak
+    state: restarted
+
+- name: drestart osmstreak
+  become: yes
+  systemd:
+    name: osmstreak
+    daemon_reload: true
+    state: restarted

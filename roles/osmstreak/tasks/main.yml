@@ -1,0 +1,116 @@
+---
+- name: Check out OSM Streak
+  git:
+    repo: https://github.com/Zverik/osmstreak
+    dest: "{{ sites }}/osmz.ru/streak"
+    recursive: true
+  notify: restart osmstreak
+
+- name: Upload config
+  template:
+    src: config_local.py
+    dest: "{{ sites }}/osmz.ru/streak/src/config_local.py"
+  notify: restart osmstreak
+
+- name: Create virtualenv for osmstreak
+  pip:
+    requirements: "{{ sites }}/osmz.ru/streak/requirements.txt"
+    virtualenv: "{{ sites }}/osmz.ru/streak/.venv"
+
+- name: Create osmstreak mysql db
+  become: true
+  mysql_db:
+    name: "{{ osmstreak_mysql_db }}"
+    state: present
+  register: create_db
+
+- name: Create osmstreak mysql user
+  become: true
+  mysql_user:
+    name: "{{ osmstreak_mysql_user }}"
+    password: "{{ osmstreak_mysql_password }}"
+    priv: "{{ osmstreak_mysql_db }}.*:ALL"
+
+- name: Migrate DB
+  when: create_db is changed
+  command:
+    chdir: "{{ sites }}/osmz.ru/streak"
+    argv:
+      - .venv/bin/python
+      - -m
+      - src.db
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0775
+    owner: zverik
+    group: www-data
+
+- name: Create systemd service
+  become: yes
+  template:
+    src: osmstreak.service
+    dest: /etc/systemd/system/
+  notify: drestart osmstreak
+
+- name: Enable and start osmstreak systemd module
+  become: yes
+  systemd:
+    name: revertui
+    enabled: yes
+    daemon_reload: true
+    state: started
+
+- name: Add streak mail job to cron
+  cron:
+    name: osmstreak mail
+    job: "cd {{ sites }}/osmz.ru/streak && .venv/bin/python -m src.mail >> /var/log/apache2/{{domain}}/mail.log 2>&1"
+
+- name: Add osmstreak to backup
+  become: yes
+  cron:
+    name: backup osmstreak
+    minute: 0
+    hour: 4
+    job: /root/make_backup_db OsmStreak {{ whosthat_mysql_db }} "{{ sites }}/osmz.ru/streak/telegram.state"
+
+- name: Restore osmstreak
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup_db"
+      - OsmStreak
+      - "{{ whosthat_mysql_db }}"
+      - '*'
+    chdir: /
+
+- name: Ensure http_proxy is enabled
+  become: yes
+  apache2_module:
+    name: proxy_http
+    state: present
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.streak }}/privkey.pem---NOPE"
+  register: streak_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

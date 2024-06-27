@@ -1,0 +1,5 @@
+---
+osmstreak_port: 3004
+osmstreak_mysql_db: osmstreak
+osmstreak_mysql_user: osmstreak
+osmstreak_mysql_password: ""

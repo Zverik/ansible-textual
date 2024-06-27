@@ -42,6 +42,12 @@ osmauth_client_id: "{{ v_osmauth_client_id }}"
 osmauth_client_secret: "{{ v_osmauth_client_secret }}"
 osmauth_mysql_password: "{{ v_osmauth_mysql_password }}"
 
+osmstreak_mysql_password: "{{ v_osmstreak_mysql_password }}"
+osmstreak_client_id: "{{ v_osmstreak_client_id }}"
+osmstreak_client_secret: "{{ v_osmstreak_client_secret }}"
+osmstreak_telegram_token: "{{ v_osmstreak_telegram_token }}"
+osmstreak_secret: "{{ v_osmstreak_secret }}"
+
 piwik_db_password: "{{ v_piwik_db_password }}"
 piwik_salt: "{{ v_piwik_salt }}"
 
