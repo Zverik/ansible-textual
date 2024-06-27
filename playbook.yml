@@ -3,7 +3,7 @@
   gather_facts: no
   become: yes
   roles:
-    - common
+    - { role: common, tags: common }
 
 - hosts: all
   tasks:
