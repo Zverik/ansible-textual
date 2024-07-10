@@ -1,0 +1,350 @@
+<?php // Государственный водный реестр
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$db = new mysqli('localhost', '{{ gvr_mysql_user }}', '{{ gvr_mysql_password }}', '{{ gvr_mysql_db }}');
+if( $db->connect_errno )
+	die("Cannot connect: ".$db->connect_error);
+$db->set_charset("cp1251");
+header("Content-type: text/html; charset=windows-1251");
+setlocale(LC_CTYPE, "ru_RU.CP1251");
+
+if( isset($_GET['ajax']) && strlen($_GET['ajax']) > 0 ) {
+	process_ajax($db);
+	$db->close();
+	exit;
+}
+
+$titler = '';
+if( ($tgvridx = cleannum('card')) > 0 ) {
+	$result = $db->query("select concat(lower(wot.wotname),' ',water.woname) from water, wot where water.gvridx=$tgvridx and wot.wotid=water.wotid");
+	$data = $result->fetch_row();
+	if( $data !== null )
+		$titler = ': '.$data[0];
+}
+
+?>
+<html>
+<head>
+<title>Государственный водный реестр<?=$titler?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style type="text/css">
+body {
+	padding: 1em 1em;
+	font-family: Verdana, Tahoma, Arial, sans-serif;
+	font-size: 10pt;
+}
+h1 { font-size: 12pt; }
+h2 { font-size: 10pt; }
+td { font-size: 10pt; }
+th { font-size: 10pt; font-weight: bold; text-align: left; }
+.osm { font-family: monospace; }
+.hep { font-size: xx-small; color: #aaa; }
+.cardv { padding: 1px 0px 1px 1em; }
+.perma { color: black; }
+</style>
+<script type="text/javascript">
+function ajax(boid, rbid, subbid) {
+	if( boid == "" || boid == "0" ) {
+		document.getElementById("rb").innerHTML = "";
+	} else {
+		if( window.XMLHttpRequest ) {
+			xmlhttp = new XMLHttpRequest();
+		} else {
+			// IE5,IE6
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange = function() {
+			if( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
+				document.getElementById("rb").innerHTML = xmlhttp.responseText;
+			}
+		}
+		xmlhttp.open("GET", "<?=$_SERVER['PHP_SELF']?>?ajax=1&bo="+boid+"&rb="+rbid+"&subb="+subbid, true);
+		xmlhttp.send();
+	}
+}
+</script>
+</head>
+<body onload="javascript:f.name.focus();">
+<h1>Поиск по данным государственного водного реестра</h1>
+<form action="<?=$_SERVER['PHP_SELF']?>" method="get" name="f">
+Бассейн <select name="bo" onchange="javascript:ajax(this.value,0,0,0);"><option value="0">Любой</option><?=fetch_dict($db, "select boid, boname from bo", cleannum('bo'))?></select>
+<span id="rb"><?php process_ajax($db); ?></span>
+<br>
+Тип объекта <select name="wot"><option value="0">Любой</option><?=fetch_dict($db, "select wotid, wotname from wot", cleannum('wot'))?></select>
+Название <input type="text" name="name" size="14" value="<?=!isset($_REQUEST['name']) ? '' : htmlentities(stripslashes($_REQUEST['name']), ENT_QUOTES, 'windows-1251')?>">
+№<input type="text" name="num" size="5" value="<?=cleannum('num') > 0 ? cleannum('num') : ''?>">
+<!--input type="checkbox" name="nl"<?=isset($_REQUEST['nl']) && strlen($_REQUEST['nl']) > 0 ? ' checked="checked"' : ''?>> или-->
+Местоположение <input type="text" name="loc" size="20" value="<?=!isset($_REQUEST['loc']) ? '' : htmlentities(stripslashes($_REQUEST['loc']), ENT_QUOTES, 'windows-1251')?>">
+<input type="submit" name="s" value="Поиск">
+<input type="button" onclick="javascript:window.location='<?=$_SERVER['PHP_SELF']?>?bo=<?=cleannum('bo')?>';" value="Очистить">
+</form>
+<?php if (!isset($_REQUEST['card']) && !isset($_REQUEST['name'])): ?><p>Внимание: данные загружены в 2011 году и с тех пор не обновлялись.<br>
+Впрочем, альтернативы у вас тоже нет, потому что министерство водных ресурсов больше не публикует реестр.</p><?php endif ?>
+<?php
+if( cleannum('card') == 0 ) {
+	// результаты поиска, список
+	$boid = cleannum('bo');
+	$subbidx = cleannum('subb');
+	$rbidx = cleannum('rb');
+	$hepidx = cleannum('hep');
+	$wotid = cleannum('wot');
+	$num = cleannum('num');
+	$start = cleannum('start');
+	$name = input2like($db, 'name');
+	if( $name == '-' || $name == '-%' ) $name = '%без названия';
+	$loc = input2like($db, 'loc');
+	$qf = "water.gvridx, water.woname, water.geoloc, lower(wot.wotname)";
+	$qt = "water, wot";
+	$qw = "wot.wotid=water.wotid";
+	$ok = 0;
+	if( $wotid > 0 ) $qw .= " and water.wotid = $wotid";
+	if( $hepidx > 0 ) { $ok=1; $qw .= " and water.hepidx = $hepidx"; }
+	elseif( $subbidx > 0 ) { $ok=1; $qt .= ",hep"; $qw .= " and hep.subbidx=$subbidx and water.hepidx=hep.hepidx"; }
+	elseif( $rbidx > 0 ) {$ok=1; $qt .= ",hep"; $qw .= " and hep.rbidx=$rbidx and water.hepidx=hep.hepidx"; }
+	elseif( $boid > 0 ) { $qt .= ",hep,rb"; $qw .= " and rb.boid=$boid and hep.rbidx=rb.rbidx and water.hepidx=hep.hepidx"; }
+	if( strlen($name) > 0 ) { $ok=1; $qw .= " and water.woname like '$name'"; }
+	if( strlen($loc) > 0 ) { $ok=1; $qw .= " and water.geoloc like '%$loc'"; }
+	if( $num > 0 ) { $ok=1; $qt .= ",waternum"; $qw .= " and waternum.gvridx = water.gvridx and waternum.idnum = $num"; }
+	if( $hepidx == 0 ) {
+		$qf .= ', hep.hepname';
+		if( strstr($qt, 'hep') === FALSE ) { $qt .= ',hep'; $qw .= ' and water.hepidx = hep.hepidx'; }
+	}
+	if( $ok == 1 ) {
+		$q = "select $qf from $qt where $qw order by water.woname";
+		$result = $db->query($q);
+		if( $result === FALSE )
+			echo "Неправильно составлен запрос: $q";
+		else {
+			$cntt = $result->num_rows;
+			if( $start > 0 && $cntt > 1 ) {
+				$result->data_seek(min($start, $cntt-1));
+			}
+			$cnt = min(200, $cntt);
+			?><h2>Результаты поиска (<?=$cntt > $cnt ? "$cnt из $cntt" : $cnt?><?=$start > 0 ? ", начиная с ".($start+1) : '' ?>):</h2><?
+			while( (($data = $result->fetch_row()) !== null) && $cnt-- > 0 ) {
+				echo "<a href=\"".$_SERVER['PHP_SELF']."?card=".$data[0]."&".remembersearch()."\">".$data[3].' '.$data[1]."</a>, ".$data[2].($hepidx == 0 ? ' <span class="hep">('.$data[4].')</span>' : '')."<br>\n";
+				if( $cntt == 1 ) {
+					?><script language="javascript">window.location='<?=$_SERVER['PHP_SELF']?>?card=<?=$data[0]?>&<?=remembersearch()?>';</script><?
+				}
+			}
+			if( $cntt > $start + 200 ) {
+				?><p><a href="<?=$_SERVER['PHP_SELF'].'?'.remembersearch() ?>&start=<?=$start+200?>">следующая страница результатов</a></p><?
+			}
+		}
+	}
+} else if( isset($_REQUEST['card']) && ($gvridx = cleannum('card')) > 0 ) {
+	// карточка водного объекта
+	$result = $db->query("select water.gvrid, water.woname, wot.wotname, water.geoloc, water.hepidx, water.wotid, water.idgidrol, water.volnum, water.volver from water,wot where water.gvridx=$gvridx and wot.wotid=water.wotid");
+	$data = $result->fetch_row();
+	if( $data === FALSE )
+		echo "Объект $gvridx отсутствует в базе.";
+	else {
+		$data[0] = str_pad($data[0], 23, '0', STR_PAD_LEFT);
+		$hepidx = $data[4];
+		$result = $db->query("select bo.boid, bo.boname, rb.rbid, rb.rbname, hep.hepid, hep.hepname, hep.subbidx, hep.rbidx from hep,bo,rb where rb.rbidx=hep.rbidx and bo.boid=rb.boid and hep.hepidx=$hepidx");
+		$hepdata = $result->fetch_row();
+		$subbidx = isset($hepdata[6]) ? $hepdata[6] : 0;
+		if( $subbidx > 0 ) {
+			$result = $db->query("select subbid, subbname from subb where subbidx=$subbidx");
+			$subbdata = $result->fetch_row();
+		}
+		$wtype = $data[5] < 20 ? 1 : ($data[5] < 30 ? 2 : 0); // 2 - река, 1 - озеро
+		if( $wtype > 0 ) {
+			$result = $db->query("select wo".($wtype == 2 ? 'length' : 'area').", collecting_area from ".($wtype == 2 ? 'rivers' : 'lakes')." where gvridx=$gvridx");
+			$wdata = $result->fetch_row();
+		}
+		if( !isset($wdata) || $wdata === FALSE )
+			$wdata = array(0, 0);
+
+		$flowk = ''; $flowv = ''; $flowk1 = ''; $flowv1 = '';
+		if( $wtype == 1 ) { // из озера вытекают
+			$result = $db->query("select flow.intoidx, concat(lower(wot.wotname),' ',water.woname), flow.km from flow, water, wot where flow.gvridx=$gvridx and water.gvridx=flow.intoidx and wot.wotid=water.wotid");
+			$vytek = array(); $vpad = array();
+			while( ($fdata = $result->fetch_row()) !== null ) {
+				$str = "<a href=\"".$_SERVER['PHP_SELF']."?card=$fdata[0]\">$fdata[1]</a>";
+				if( strlen($fdata[2]) == 0 ) $vpad[] = $str;
+				else $vytek[] = $str;
+			}
+			if( count($vytek) > 0 ) {
+				$flowk = count($vytek) > 1 ? 'Вытекают' : 'Вытекает';
+				$flowv = implode(', ', $vytek);
+			}
+			if( count($vpad) > 0 ) {
+				$flowk1 = 'Впадает в';
+				$flowv1 = implode(', ', $vpad);
+			}
+		} else { // река впадает в
+			$result = $db->query("select flow.intoidx, flow.km, concat(lower(wot.wotname),' ',water.woname) from flow, water, wot where flow.gvridx=$gvridx and water.gvridx=flow.intoidx and wot.wotid=water.wotid");
+			if( ($fdata = $result->fetch_row()) !== null ) {
+				$flowk1 = 'Впадает в';
+				$flowv1 = "<a href=\"".$_SERVER['PHP_SELF']."?card=$fdata[0]\">$fdata[2]</a>";
+				$flowv1 .= $fdata[1] <= 0 ? '' : " в ".flformat($fdata[1])." км от устья";
+			}
+			// исток
+			$result = $db->query("select flow.gvridx, concat(lower(wot.wotname),' ',water.woname) from flow, water, wot where flow.intoidx=$gvridx and water.gvridx=flow.gvridx and wot.wotid=water.wotid and flow.km = 0");
+			if( ($fdata = $result->fetch_row()) !== null ) {
+				$flowk = 'Исток';
+				$flowv = "<a href=\"".$_SERVER['PHP_SELF']."?card=$fdata[0]\">$fdata[1]</a>";
+			}
+		}
+		?>
+<h2><a class="perma" href="<?=$_SERVER['PHP_SELF']."?card=".$gvridx?>"><?=$data[2].' '.$data[1]?></a></h2>
+<table cellpadding="0" cellspacing="0" border="0">
+<? foreach( array(
+	'Код водного объекта' => $data[0],
+	'Тип водного объекта' => $data[2],
+	'Название' => $data[1],
+	'Местоположение' => parseloc($hepdata[0],$hepdata[7],$data[3]),
+	$flowk => $flowv, $flowk1 => $flowv1,
+	'Бассейновый округ' => $hepdata[1].' ('.$hepdata[0].')',
+	'Речной бассейн' => $hepdata[3].' ('.$hepdata[2].')',
+	'Речной подбассейн' => $subbidx < 1 ? '<i>нет</i> (0)' : $subbdata[1].' ('.$subbdata[0].')',
+	'Водохозяйственный участок' => $hepdata[5].' ('.$hepdata[4].')',
+	$wtype == 1 ? 'Площадь водоёма' : ($wtype == 2 ? 'Длина водотока' : '') => $wtype > 0 ? flformat($wdata[0]).' км'.($wtype == 1 ? '&sup2;' : '') : '',
+	$wtype > 0 ? 'Водосборная площадь' : '' => $wtype > 0 ? flformat($wdata[1]).' км&sup2;' : '',
+	'Код по гидрологической изученности' => $data[6],
+	'Номер тома по ГИ' => $data[7],
+	'Выпуск по ГИ' => $data[8]
+	) as $k => $v ) if( strlen($k) > 0 ) { ?>
+<tr><td><b><?=$k?></b></td><td class="cardv"><?=$v?></td></tr>
+<? } ?>
+</table>
+<?
+	$result = $db->query("select wfrom, wto, wlength from ways where gvridx=$gvridx");
+	if( $result->num_rows > 0 ) {
+		echo '<h2>Объект входит в перечень водных путей РФ</h2><table cellpadding="0" cellspacing="0" border="0">';
+		while( ($waydata = $result->fetch_row()) !== null ) { ?>
+<tr><td><?=$waydata[0]?> &mdash; <?=$waydata[1]?>:</td>
+<td class="cardv"><?=flformat($waydata[2])?> км</td></tr>
+<?		}
+		echo "</table>";
+		$boatyes = true;
+	}
+?>
+<h2>Пример заполнения данных <a href="https://www.openstreetmap.org/">OpenStreetMap</a></h2>
+<p>Внимание, это только пример, не копируйте значения в теги как есть, не думая.</p>
+<div class="osm">
+<?	if( $wtype == 1 ) echotag('natural','water');
+	elseif( $data[5] == 22) echotag('waterway','stream');
+	elseif( $data[5] == 23) echotag('waterway','canal');
+	elseif( $wtype == 2 ) echotag('waterway','river');
+	elseif( $data[5] == 41) echotag('natural','spring');
+	elseif( $data[5] >= 50 && $data[5] <= 59 ) echotag('natural','coastline');
+	elseif( $data[5] >= 60) { echo 'Подземный водный объект, что-то с '; echokey('layer',-1); }
+	echokey('name', $data[1]);
+	echokey('status', mb_strtolower($data[2], 'cp1251'));
+	if( $wtype == 2 && $data[5] != 22 ) echokey('boat', !isset($boatyes) && substr($wdata[1], 0, strpos($wdata[1], '.')) < 5000 ? 'no' : 'yes');
+	echo('gvr:code='.$data[0]);
+?>
+</div>
+<?
+
+	// впадающие реки
+	$rivers = array(); $lakes = array(); $prot = array();
+	$result = $db->query("select flow.gvridx, concat(lower(wot.wotname),' ',water.woname), flow.km from flow, water, wot, hep where flow.intoidx=$gvridx and water.gvridx=flow.gvridx and wot.wotid=water.wotid and hep.hepidx=water.hepidx order by flow.km, hep.hepid desc, water.woname");
+	while( ($fdata = $result->fetch_row()) !== null ) {
+		$str = "<a href=\"".$_SERVER['PHP_SELF']."?card=$fdata[0]\">$fdata[1]</a>";
+		if( strlen($fdata[2]) == 0 ) $lakes[] = $str;
+		else if( $fdata[2] < 0 ) $prot[] = $str;
+		else if( $fdata[2] > 0 ) $rivers[] = flformat($fdata[2])." км: $str";
+	}
+	if( count($rivers) > 0 || count($lakes) > 0 || count($prot) > 0 ) {
+?><table cellspacing="8" cellpadding="0" border="0">
+<tr><th>Впадают реки (км от устья)</th><th>Впадают <?=$wtype == 1 ? 'реки' : 'озёра'?></th><th>Протекает через озёра</th></tr><tr>
+<td valign="top"><?=implode('<br>', $rivers) ?></td>
+<td valign="top"><?=implode('<br>', $lakes) ?></td>
+<td valign="top"><?=implode('<br>', $prot) ?></td>
+</tr></table><?
+	}
+	}
+}
+?>
+</body>
+</html>
+<?
+$db->close();
+
+function fetch_dict( $db, $query, $value ) {
+	$result = $db->query($query);
+	if( $result === FALSE ) return '';
+	$res = '';
+	while( ($data = $result->fetch_row()) !== null ) {
+		$res .= '<option value="'.$data[0].'"'.($data[0] == $value ? ' selected="selected"' : '').'>'.$data[1].'</option>';
+	}
+	return $res;
+}
+
+function process_ajax($db) {
+	$boid = cleannum('bo');
+	$subbidx = cleannum('subb');
+	$rbidx = cleannum('rb');
+	$hepidx = cleannum('hep');
+
+	if( $boid < 1 ) return;
+
+?>Речной бассейн&nbsp;<select name="rb" onchange="javascript:ajax(f.bo.value,this.value,0);"><option value="0">Любой</option>
+<?=fetch_dict($db, "select rbidx, rbname from rb where boid=$boid", $rbidx)?></select><?
+
+	if( $rbidx < 1 ) return;
+
+?><br>Речной подбассейн&nbsp;<select name="subb" onchange="javascript:ajax(f.bo.value,f.rb.value,this.value);"><option value="0">Любой</option>
+<?=fetch_dict($db, "select subbidx, subbname from subb where rbidx=$rbidx", $subbidx)?></select><?
+
+?> Водохозяйство&nbsp;<select name="hep"><option value="0">Любое</option>
+<?=fetch_dict($db, "select hepidx, hepname from hep where rbidx=$rbidx".($subbidx < 1 ? '' : " and subbidx=$subbidx"), $hepidx)?></select><?
+}
+
+// если параметр - число, возвращает его, иначе 0
+function cleannum( $param ) {
+	return isset($_REQUEST[$param]) && preg_match('/^\d+$/', $_REQUEST[$param]) ? $_REQUEST[$param] : 0;
+}
+
+// возвращает все параметры поиска bo=&rb=&...
+function remembersearch() {
+	return "bo=".cleannum('bo')."&rb=".cleannum('rb')."&subb=".cleannum('subb')."&hep=".cleannum('hep').
+		'&wot='.cleannum('wot').'&name='.(isset($_REQUEST['name']) ? $_REQUEST['name'] : '').
+		'&loc='.(isset($_REQUEST['loc']) ? $_REQUEST['loc'] : '').
+		(cleannum('num') > 0 ? '&num='.cleannum('num') : '');
+}
+
+// заменяет name*2 на name%2%
+function input2like( $db, $param ) {
+	$input = isset($_REQUEST[$param]) ? $_REQUEST[$param] : '';
+	$input = $db->real_escape_string($input);
+	$input = str_replace('*', '%', $input);
+	while( substr($input, -1) == '%' )
+		$input = substr($input, 0, strlen($input) - 1);
+	if( strlen($input) > 0 )
+		if( substr($input,0,1) == '!' ) $input = substr($input, 1);
+		else $input .= '%';
+	return $input;
+}
+
+// форматирует число из NNN.MMM
+function flformat( $n ) {
+	return str_replace('.',',',preg_replace('/^(\d*)(?:(\.[1-9]\d*?)|\.)0*$/', '$1$2', $n));
+}
+
+function echotag( $k, $v ) {
+	$wiki = "http://wiki.openstreetmap.org/wiki/RU:";
+	echo "<a href=\"${wiki}Key:$k\">$k</a>=<a href=\"${wiki}Tag:$k%3D$v\">$v</a><br>";
+}
+
+function echokey( $k, $s ) {
+	$wiki = "http://wiki.openstreetmap.org/wiki/RU:";
+	echo "<a href=\"${wiki}Key:$k\">$k</a>=$s<br>";
+}
+
+// проставляет ссылки на поиск в местоположение
+function parseloc( $bo, $rb, $loc ) {
+	$loc = preg_replace('/\b(проток[аи] без н[звания.]+ №(\d+))/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&rb=$rb&name=-&num=$2&wot=20\">$1</a>", $loc);
+	$loc = preg_replace('/\b(руч[ьяей.] без н[звания.]+ №(\d+))/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&rb=$rb&name=-&num=$2&wot=22\">$1</a>", $loc);
+	$loc = preg_replace('/\b(р[екаи.] без н[звания.]+ №(\d+))/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&rb=$rb&name=-&num=$2&wot=21\">$1</a>", $loc);
+	$loc = preg_replace('/\b(?<!>)(оз[ероа.] (\w+))/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&rb=$rb&name=$2&wot=11\">$1</a>", $loc);
+	$loc = preg_replace('/\b(?<=исток )(р[еки.] ([\w-]+)\w)/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&rb=$rb&name=$2&wot=21\">$1</a>", $loc);
+	$loc = preg_replace('/\b(?<!>|п)(р[екаи.] ([\w-]+))/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&rb=$rb&name=$2&wot=21\">$1</a>", $loc);
+	$loc = preg_replace('/^(([А-Я]+(?:\/[А-Я0-9]+)+))(?=\/\d+)/', "<a href=\"".$_SERVER['PHP_SELF']."?bo=$bo&loc=%21$1\">$1</a>", $loc);
+	return $loc;
+}
+?>

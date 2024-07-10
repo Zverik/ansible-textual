@@ -84,3 +84,6 @@
 
 - name: Set up nodeid
   include_tasks: nodeid.yml
+
+- name: Set up gvr database
+  include_tasks: gvr.yml

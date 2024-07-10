@@ -1,0 +1,40 @@
+---
+- name: Upload gvr script
+  template:
+    src: gvr.php.j2
+    dest: "{{ sites }}/textual.ru/www/gvr/index.php"
+
+- name: Create gvr mysql db
+  become: true
+  community.mysql.mysql_db:
+    name: "{{ gvr_mysql_db }}"
+    state: present
+  register: gvr_create_db
+
+- name: Create gvr mysql user
+  become: true
+  community.mysql.mysql_user:
+    name: "{{ gvr_mysql_user }}"
+    password: "{{ gvr_mysql_password }}"
+    priv: "{{ gvr_mysql_db }}.*:ALL"
+
+- name: Upload gvr data dump
+  when: gvr_create_db is changed
+  copy:
+    src: gvr.sql.gz
+    dest: /tmp/gvr.sql.gz
+
+# TODO: this does not work
+- name: Import gvr data dump
+  when: gvr_create_db is changed
+  community.mysql.mysql_db:
+    name: "{{ gvr_mysql_db }}"
+    login_user: "{{ gvr_mysql_user }}"
+    login_password: "{{ gvr_mysql_password }}"
+    state: import
+    target: /tmp/gvr.sql.gz
+
+- name: Delete data dump
+  file:
+    path: /tmp/gvr.sql.gz
+    state: absent

@@ -41,6 +41,7 @@ whosthat_mysql_password: "{{ v_whosthat_mysql_password }}"
 osmauth_client_id: "{{ v_osmauth_client_id }}"
 osmauth_client_secret: "{{ v_osmauth_client_secret }}"
 osmauth_mysql_password: "{{ v_osmauth_mysql_password }}"
+gvr_mysql_password: "{{ v_gvr_mysql_password }}"
 
 osmstreak_mysql_password: "{{ v_osmstreak_mysql_password }}"
 osmstreak_client_id: "{{ v_osmstreak_client_id }}"

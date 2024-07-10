@@ -1,0 +1,4 @@
+---
+gvr_mysql_db: gvr
+gvr_mysql_user: gvr
+gvr_mysql_password: ''
