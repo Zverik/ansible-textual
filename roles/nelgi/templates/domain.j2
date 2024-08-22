@@ -1,0 +1,30 @@
+{% if nelgi_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  DocumentRoot {{ sites }}/{{ domain }}/public
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if nelgi_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.nelgi }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.nelgi }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/{{ domain }}>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if nelgi_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}

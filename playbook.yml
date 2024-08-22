@@ -56,8 +56,9 @@
     - { role: zverev, tags: zverev }
     - { role: josmru, tags: josmru }
     - { role: sotm-baltics, tags: sotmb }
+    - { role: shtosm, tags: shtosm }
+    - { role: nelgi, tags: nelgi }
     # - sharemap
-    # - shtosm
     # - shtosm-twitter
 
 - hosts: localhost

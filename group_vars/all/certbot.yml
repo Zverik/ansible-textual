@@ -26,6 +26,9 @@ cert_path:
   awards: /etc/letsencrypt/live/osmz.ru
   schedules: /etc/letsencrypt/live/osmz.ru
   streak: /etc/letsencrypt/live/osmz.ru
+  shtosm: /etc/letsencrypt/live/shtosm.ru
+  tw_shtosm: /etc/letsencrypt/live/shtosm.ru
+  nelgi: /etc/letsencrypt/live/nelgi31.ee
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -57,6 +60,9 @@ certbot_certs:
       - awards.osmz.ru
       - sotm.osmz.ru
       - streak.osmz.ru
+  - email: ilya@zverev.info
+    domains:
+      - nelgi31.ee
 
 # Needed to add --expand
 certbot_create_command: >-

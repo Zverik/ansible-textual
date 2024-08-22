@@ -1,7 +1,8 @@
 # First simple directories
 
 <VirtualHost *:80>
-	ServerName pt.osmz.ru
+	ServerName pt.osmz.ee
+	ServerAlias pt.osmz.ru
 	DocumentRoot {{ sites }}/osmz.ru/pt
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
@@ -12,7 +13,8 @@
 </VirtualHost>
 
 <VirtualHost *:80>
-	ServerName dms.osmz.ru
+	ServerName dms.osmz.ee
+	ServerAlias dms.osmz.ru
 	DocumentRoot {{ sites }}/osmz.ru/dms
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
@@ -23,7 +25,8 @@
 </VirtualHost>
 
 <VirtualHost *:80>
-	ServerName cards.osmz.ru
+	ServerName cards.osmz.ee
+	ServerAlias cards.osmz.ru
 	DocumentRoot {{ sites }}/osmz.ru/cards
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
@@ -35,7 +38,8 @@
 </VirtualHost>
 
 <VirtualHost *:80>
-	ServerName krym.osmz.ru
+	ServerName krym.osmz.ee
+	ServerAlias krym.osmz.ru
 	DocumentRoot {{ sites }}/osmz.ru/krym
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
@@ -51,12 +55,13 @@
 	ServerAlias *.crimea.osmz.ru
 	ServerAlias www.krym.osmz.ru
 	ServerAlias *.krym.osmz.ru
-	Redirect permanent / http://krym.osmz.ru/
+	Redirect permanent / http://krym.osmz.ee/
 </VirtualHost>
 
 <VirtualHost *:80>
-	ServerName birzha.osmz.ru
+	ServerName birzha.osmz.ee
 	ServerAlias market.osmz.ru
+	ServerAlias birzha.osmz.ru
 	DocumentRoot {{ sites }}/osmz.ru/birzha
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
@@ -75,7 +80,7 @@
 {% else %}
 <VirtualHost *:80>
 {% endif %}
-	ServerName osmz.ru
+	ServerName osmz.ee
 	DocumentRoot {{ sites }}/osmz.ru/www
 	CustomLog /var/log/apache2/osmz.ru/access_log combined
 	ErrorLog /var/log/apache2/osmz.ru/error_log
@@ -93,9 +98,23 @@
 </VirtualHost>
 
 {% if osmz_cert.stat.exists %}
+<VirtualHost *:443>
+	ServerName osmz.ru
+	Redirect permanent / https://osmz.ee/
+</VirtualHost>
+
 <VirtualHost *:80>
 	ServerName osmz.ru
 	ServerAlias www.osmz.ru
-	Redirect permanent / https://osmz.ru/
+	ServerAlias osmz.ee
+	ServerAlias www.osmz.ee
+	Redirect permanent / https://osmz.ee/
+</VirtualHost>
+<VirtualHost *:80>
+	ServerName osmz.ru
+	ServerAlias www.osmz.ru
+	ServerAlias osmz.ee
+	ServerAlias www.osmz.ee
+	Redirect permanent / https://osmz.ee/
 </VirtualHost>
 {% endif %}

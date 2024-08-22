@@ -1,0 +1,16 @@
+---
+nelgi_mysql_db: nelgi31
+nelgi_mysql_user: nelgi
+nelgi_mysql_password: ""
+
+nelgi_app_key: SomethingRandom
+
+nelgi_email_host: smtp.fastmail.com
+nelgi_email_login: ""
+nelgi_email_password: ""
+
+nelgi_facebook_app_id: "false"
+nelgi_facebook_app_secret: "false"
+
+nelgi_google_app_id: "false"
+nelgi_google_app_secret: "false"

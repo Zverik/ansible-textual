@@ -1,0 +1,158 @@
+.header-content {
+    position: inherit;
+    margin: 0;
+}
+
+.flag {
+    background-color: #f0f0f0;
+    padding: 30px 0;
+    margin-bottom: 1em;
+}
+
+@media (prefers-color-scheme: dark) {
+    .flag {
+        background-color: #000000;
+    }
+}
+
+.logo {
+    display: inherit;
+    position: absolute;
+    top: -7px;
+    left: 50px;
+    margin: 0 20px;
+    width: 180px;
+}
+
+.logo img {
+    border-radius: 0;
+}
+
+@media (max-width: 720px) {
+    .sidebar, .logo {
+        display: none;
+    }
+    .flag .title {
+        margin: 0 19%;
+    }
+}
+
+.e2-user-picture-container img {
+    width: 81px;
+}
+
+.title h1, .title h1 a {
+  font-family: "Cambria", "Georgia", serif;
+  letter-spacing: -1px;
+  font-size: 30px;
+  font-weight: 400;
+  color: #c04800 !important;
+  border-bottom: none;
+}
+
+.spotlight {
+    margin-top: 0;
+}
+
+.title {
+    margin: 0 9% 0 220px;
+}
+
+@media (min-width: 720px) {
+    .content {
+        margin: 0 9% 40px 220px;
+        width: 70%;
+    }
+}
+
+@media (max-width: 640px) {
+    .sidebar, .logo {
+        display: none;
+    }
+
+    .title {
+        margin: 0 9%;
+    }
+
+    .content {
+        margin: 0 9% 40px 9%;
+        width: 82%;
+    }
+}
+
+.sidebar {
+  float: left;
+  background: inherit;
+  position: static;
+  left: 0;
+  top: 0;
+  padding: 16px 0 0;
+  border-radius: 0;
+  width: 180px;
+  margin: 0 5px 0 26px;
+  font-size: 80%;
+}
+
+.sidebar h2 {
+  margin: 0 0;
+  font-weight: bold;
+  font-size: 110%;
+}
+
+.sidebar li {
+  list-style-type: none;
+}
+
+.sidebar h2 a {
+  font-weight: normal;
+  color: #004276;
+}
+
+.sidebar input.text {
+  width: 150px;
+}
+
+.sidebar .sidebar-element {
+  clear: left;
+  margin-bottom: 14px;
+}
+
+.footer {
+    clear: both;
+}
+
+.e2-text { 
+  max-width: 700px;
+}
+
+.e2-text ul, .e2-text ol {
+  padding-top: 1em !important;
+}
+
+.e2-text ul li {
+  list-style-type: disc !important;
+}
+
+blockquote {
+  margin-top: 1.5em;
+}
+
+.form-control {
+  clear: none;
+}
+
+.form-control::after, .e2-comment::after {
+    clear: none;
+}
+
+#share-element {
+    position: relative;
+}
+
+.disclaimer {
+    margin: 1em 0 2em;
+}
+
+.disclaimer p {
+    font-style: italic;
+}

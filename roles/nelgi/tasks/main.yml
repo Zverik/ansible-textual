@@ -1,0 +1,114 @@
+---
+- name: Checkout bookstack repo
+  git:
+    repo: https://github.com/BookStackApp/BookStack
+    dest: "{{ sites }}/{{ domain }}"
+    version: release
+    single_branch: true
+  register: nelgi_git
+
+- name: Run composer
+  community.general.composer:
+    command: install
+    working_dir: "{{ sites }}/{{ domain }}"
+
+# Note: it uses the app key. To generate a new one, run:
+# php artisan key:generate
+- name: Upload the bookstack config
+  template:
+    src: env.j2
+    dest: "{{ sites }}/{{ domain }}/.env"
+
+- name: Generate the key with php artisan
+  when: false
+  command:
+    argv:
+      - php
+      - artisan
+      - "key:generate"
+      - --force
+    chdir: "{{ sites }}/{{ domain }}"
+
+- name: Create nelgi mysql db
+  become: true
+  mysql_db:
+    name: "{{ nelgi_mysql_db }}"
+    state: present
+  register: nelgi_db
+
+- name: Create nelgi mysql user
+  become: true
+  mysql_user:
+    name: "{{ nelgi_mysql_user }}"
+    password: "{{ nelgi_mysql_password }}"
+    priv: "{{ nelgi_mysql_db }}.*:ALL"
+
+- name: Migrate the database
+  when: nelgi_db is changed or nelgi_git is changed
+  command:
+    argv:
+      - php
+      - artisan
+      - migrate
+      - --force
+    chdir: "{{ sites }}/{{ domain }}"
+
+- name: Add nelgi to backup
+  become: yes
+  cron:
+    name: backup nelgi
+    minute: 0
+    hour: 4
+    job: /root/make_backup_db Nelgi {{ nelgi_mysql_db }} "{{ sites }}/{{ domain }}/storage/uploads" "{{ sites }}/{{ domain }}/public/uploads"
+
+- name: Restore nelgi
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup_db"
+      - Nelgi
+      - "{{ nelgi_mysql_db }}"
+      - '*'
+    chdir: /
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.nelgi }}/privkey.pem"
+  register: nelgi_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache
+
+- name: Ensure some folders are writable by the web server
+  become: true
+  file:
+    path: "{{ sites }}/{{ domain }}/{{ item }}"
+    state: directory
+    recurse: true
+    owner: www-data
+  loop:
+    - storage
+    - bootstrap/cache
+    - public/uploads

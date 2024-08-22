@@ -1,0 +1,6 @@
+<? if (!$content['sign-in']['required?']) { ?>
+<? if (array_key_exists ('only', $content['notes'])) { ?>
+  <? _JS ('share-script') ?>
+  <div id="share-element" share:url="<?= $content['notes']['only']['href'] ?>" style="margin-top: -.7em; height: 18px; margin-bottom: 1em;"></div>
+<? } ?>
+<? } ?>

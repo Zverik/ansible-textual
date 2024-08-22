@@ -2,6 +2,7 @@
 ntp_timezone: Europe/Tallinn
 admin_email: ilya@zverev.info
 admin: zverik
+www_user: www-data
 
 borg_repo: "{{ v_borg_repo }}"
 borg_pass: "{{ v_borg_pass }}"
@@ -31,6 +32,7 @@ offsets_client_id: "{{ v_offsets_client_id }}"
 offsets_client_secret: "{{ v_offsets_client_secret }}"
 offsets_mysql_password: "{{ v_offsets_mysql_password }}"
 seen_mysql_password: "{{ v_seen_mysql_password }}"
+shtosm_mysql_password: "{{ v_shtosm_mysql_password }}"
 radio_mysql_password: "{{ v_radio_mysql_password }}"
 level0_client_id: "{{ v_level0_client_id }}"
 level0_client_secret: "{{ v_level0_client_secret }}"
@@ -42,6 +44,16 @@ osmauth_client_id: "{{ v_osmauth_client_id }}"
 osmauth_client_secret: "{{ v_osmauth_client_secret }}"
 osmauth_mysql_password: "{{ v_osmauth_mysql_password }}"
 gvr_mysql_password: "{{ v_gvr_mysql_password }}"
+
+nelgi_mysql_password: "{{ v_nelgi_mysql_password }}"
+nelgi_app_key: "{{ v_nelgi_app_key }}"
+nelgi_email_host: "{{ v_nelgi_email_host }}"
+nelgi_email_login: "{{ v_nelgi_email_login }}"
+nelgi_email_password: "{{ v_nelgi_email_password }}"
+nelgi_facebook_app_id: "{{ v_nelgi_facebook_app_id }}"
+nelgi_facebook_app_secret: "{{ v_nelgi_facebook_app_secret }}"
+nelgi_google_app_id: "{{ v_nelgi_google_app_id }}"
+nelgi_google_app_secret: "{{ v_nelgi_google_app_secret }}"
 
 osmstreak_mysql_password: "{{ v_osmstreak_mysql_password }}"
 osmstreak_client_id: "{{ v_osmstreak_client_id }}"

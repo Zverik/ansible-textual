@@ -1,0 +1,6 @@
+---
+# shtosm_aegea_version: "3576"
+shtosm_aegea_version: "4134"
+shtosm_mysql_db: shtosm
+shtosm_mysql_user: whatosm
+shtosm_mysql_password: ""
