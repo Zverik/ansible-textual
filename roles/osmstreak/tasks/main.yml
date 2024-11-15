@@ -17,6 +17,11 @@
     requirements: "{{ sites }}/osmz.ru/streak/requirements.txt"
     virtualenv: "{{ sites }}/osmz.ru/streak/.venv"
 
+- name: Install pymysql
+  pip:
+    name: pymysql
+    virtualenv: "{{ sites }}/osmz.ru/streak/.venv"
+
 - name: Create osmstreak mysql db
   become: true
   mysql_db:
@@ -97,7 +102,7 @@
 - name: Check that the certificate exists
   become: yes
   stat:
-    path: "{{ cert_path.streak }}/privkey.pem---NOPE"
+    path: "{{ cert_path.streak }}/privkey.pem"
   register: streak_cert
 
 - name: Add apache domain

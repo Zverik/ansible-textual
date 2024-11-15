@@ -13,7 +13,7 @@ cert_path:
   pma: /etc/letsencrypt/live/textual.ru
   offsets: /etc/letsencrypt/live/textual.ru
   awstats: /etc/letsencrypt/live/textual.ru
-  seeing: /etc/letsencrypt/live/textual.ru
+  seeing: /etc/letsencrypt/live/seen.textual.ru
   osmz: /etc/letsencrypt/live/osmz.ru
   ommm: /etc/letsencrypt/live/osmz.ru
   level0: /etc/letsencrypt/live/osmz.ru
@@ -46,6 +46,9 @@ certbot_certs:
       - phpmyadmin.textual.ru
       - offsets.textual.ru
       - awstats.textual.ru
+  - email: ilya@zverev.info
+    domains:
+      - seen.textual.ru
   - email: ilya@zverev.info
     domains:
       - osmz.ru
