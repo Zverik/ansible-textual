@@ -20,6 +20,9 @@
     Options FollowSymLinks Includes MultiViews
     AllowOverride All
   </Directory>
+  <FilesMatch \.php$>
+    SetHandler "proxy:unix:/var/run/php/php7.4-fpm.sock|fcgi://localhost"
+  </FilesMatch>
 </VirtualHost>
 
 {% if shtosm_cert.stat.exists %}

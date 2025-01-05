@@ -1,4 +1,4 @@
-﻿<?
+﻿<?php
 	$limit = 20;
 	$blogauthor = 'Илья «Zverik»';
 	$db = mysql_connect('localhost', 'whatosm', '3G8A8p6HvsuyQP4U') or die('Could not connect: '.mysql_error());

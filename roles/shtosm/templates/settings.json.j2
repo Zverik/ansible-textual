@@ -2,26 +2,30 @@
     "db": {
         "server": "localhost",
         "user_name": "{{ shtosm_mysql_user }}",
-        "passw": "",
-        "name": "{{ shtosm_mysql_db }}",
-        "exists": true
+        "passw": "{{ shtosm_mysql_password_hashed }}",
+        "name": "{{ shtosm_mysql_db }}"
     },
     "timezone": {
-        "offset": 10800,
+        "offset": 14400,
         "is_dst": false
     },
-    "template": "shtosm",
-    "language": "ru",
     "appearance": {
         "notes_per_page": 5,
         "favourites_frontpage": false,
         "show_sharing_buttons": true,
-        "respond_to_dark_mode": true
+        "respond_to_dark_mode": true,
+        "show_view_counts": false
     },
     "comments": {
         "fresh_only": true,
-        "default_on": true
+        "default_on": true,
+        "require_gip": false
     },
+    "user": {
+        "email": "ilya@zverev.info"
+    },
+    "template": "shtosm",
+    "language": "ru",
     "max-image-width": "800",
     "notifications": {
         "new_comments": true
@@ -29,6 +33,5 @@
     "site_title": "ШТОСМ",
     "description": "",
     "author": "Илья Зверев",
-    "author_email": "ilya@zverev.info",
     "v3223_rss_permalinks_before_stamp": 1526040552
 }

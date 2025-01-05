@@ -1,4 +1,22 @@
 ---
+- name: Set up ppa for php7
+  become: true
+  apt_repository:
+    repo: ppa:ondrej/php
+
+- name: Install php7
+  become: true
+  apt:
+    name:
+      - php7.4
+      - php7.4-fpm
+      - php7.4-mysql
+      - php7.4-gd
+      - php7.4-mbstring
+      - libapache2-mod-php7.4
+      - libapache2-mod-fcgid
+    state: present
+
 - name: Install or update aegea
   import_tasks: aegea.yml
   vars:
@@ -19,11 +37,15 @@
     password: "{{ shtosm_mysql_password }}"
     priv: "{{ shtosm_mysql_db }}.*:ALL"
 
-- name: Enable apache mod_rewrite
+- name: Enable apache mod_rewrite and fcgi
   become: yes
   apache2_module:
-    name: rewrite
+    name: "{{ item }}"
     state: present
+  loop:
+    - rewrite
+    - fcgid
+    - proxy_fcgi
   notify: restart apache
 
 - name: Add shtosm to backup

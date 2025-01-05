@@ -102,6 +102,7 @@
   loop:
     - .htaccess
     - system
+    - themes
 
 - name: Delete temporary aegea files
   file:
@@ -120,7 +121,7 @@
   become: yes
   copy:
     src: theme/
-    dest: "{{ path }}/user/themes/{{ theme_name }}"
+    dest: "{{ path }}/themes/{{ theme_name }}"
     owner: www-data
 
 - name: Upload extras
@@ -147,3 +148,10 @@
     dest: "{{ path }}/user/settings.json"
     owner: www-data
     force: false
+
+- name: Given php_value in htaccess does not work, upload the ini
+  become: yes
+  copy:
+    src: user.ini
+    dest: "{{ path }}/.user.ini"
+    owner: www-data
