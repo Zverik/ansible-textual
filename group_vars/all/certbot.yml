@@ -66,6 +66,10 @@ certbot_certs:
   - email: ilya@zverev.info
     domains:
       - nelgi31.ee
+  - email: ilya@zverev.info
+    domains:
+      - shtosm.ru
+      - twitter.shtosm.ru
 
 # Needed to add --expand
 certbot_create_command: >-
