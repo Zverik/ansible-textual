@@ -1,0 +1,16 @@
+---
+- name: restart syncthing
+  service:
+    name: syncthing
+    state: restarted
+
+- name: restart ufw
+  service:
+    name: ufw
+    state: restarted
+
+- name: restart stfed
+  service:
+    name: stfed
+    state: restarted
+    enabled: true

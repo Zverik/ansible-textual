@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e -u
+cd /srv/quartz
+npx quartz build -d /opt/sync/zettel/izv -o {{ sites }}/{{ domain }}

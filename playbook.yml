@@ -17,6 +17,7 @@
   roles:
     - { role: geerlingguy.ntp, tags: ntp }
     - { role: geerlingguy.mysql, tags: mysql }
+    - { role: geerlingguy.nodejs, tags: nodejs }
     - { role: backup, tags: backup }
     - { role: apache, tags: apache }
     - { role: firewall, tags: firewall }
@@ -27,6 +28,7 @@
     - { role: geerlingguy.certbot, tags: certbot }
     - { role: svn, tags: svn }
     - { role: znc, tags: znc }
+    - { role: syncthing, tags: syncthing }
 
 - hosts: all
   remote_user: "{{ admin }}"
@@ -58,6 +60,7 @@
     - { role: sotm-baltics, tags: sotmb }
     - { role: shtosm, tags: shtosm }
     - { role: nelgi, tags: nelgi }
+    - { role: izv, tags: izv }
     # - sharemap
     # - shtosm-twitter
 

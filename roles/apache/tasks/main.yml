@@ -1,6 +1,9 @@
 ---
-- name: Install Apache
-  apt: name=apache2
+- name: Install Apache and logrotate
+  apt:
+    pkg:
+      - apache2
+      - logrotate
 
 - name: Add 7z mime type
   lineinfile:
@@ -42,6 +45,11 @@
     path: /var/log/apache2
     state: directory
     mode: 01777
+
+- name: Update log rotation
+  copy:
+    src: logrotate-apache2.conf
+    dest: /etc/logrotate.d/apache2
 
 - name: Add certificate backups
   cron:

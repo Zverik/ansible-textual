@@ -1,0 +1,18 @@
+---
+- name: reload apache
+  become: yes
+  systemd: name=apache2 state=reloaded
+
+- name: restart stfed
+  become: yes
+  service:
+    name: stfed
+    state: restarted
+    enabled: true
+
+- name: rebuild izv
+  become: yes
+  become_user: syncthing
+  command:
+    cmd: /srv/update_izv.sh
+    chdir: /srv

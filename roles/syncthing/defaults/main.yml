@@ -1,0 +1,10 @@
+---
+syncthing_apt_key_id: "D26E6ED000654A3E"
+syncthing_apt_key_url: "https://syncthing.net/release-key.gpg"
+syncthing_apt_repository: "deb https://apt.syncthing.net/ syncthing stable"
+
+syncthing_user: syncthing
+
+rust_version: "1.84.0"
+rust_file_name: "rust-{{ rust_version }}-x86_64-unknown-linux-gnu"
+rust_url: "https://static.rust-lang.org/dist/{{ rust_file_name }}.tar.xz"

@@ -14,6 +14,8 @@ mysql_user_name: zverik
 mysql_user_password: "{{ v_mysql_user_password }}"
 mysql_packages: [mariadb-client, mariadb-server, python3-mysqldb]
 
+nodejs_version: "22.x"
+
 sites: /var/www/sites
 
 phpmyadmin_user_password: "{{ v_phpmyadmin_user_password }}"

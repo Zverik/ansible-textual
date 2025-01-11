@@ -1,0 +1,82 @@
+---
+- name: Add syncthing user
+  user:
+    name: "{{ syncthing_user }}"
+    shell: /usr/sbin/nologin
+    password: "!"
+    system: true
+    create_home: true
+
+- name: Add syncthing apt key
+  apt_key:
+    url: "{{ syncthing_apt_key_url }}"
+    keyring: /etc/apt/trusted.gpg.d/synthing.gpg
+
+- name: Add syncthing repository
+  apt_repository:
+    repo: "{{ syncthing_apt_repository }}"
+
+- name: Install syncthing
+  apt:
+    pkg: syncthing
+
+- name: Install systemd service
+  template:
+    src: syncthing.service.j2
+    dest: /etc/systemd/system/syncthing.service
+  notify: restart syncthing
+  register: syncthing_systemd
+
+- name: Reload modules
+  when: syncthing_systemd is changed
+  systemd_service:
+    daemon_reload: true
+
+- name: Open ufw ports for syncthing
+  community.general.ufw:
+    rule: allow
+    name: syncthing
+  notify: restart ufw
+
+- name: Close ufw ports for syncthing-gui
+  community.general.ufw:
+    rule: deny
+    name: syncthing-gui
+  notify: restart ufw
+
+- name: Create syncthing directories
+  file:
+    path: /opt/{{ item.path }}
+    owner: "{{ syncthing_user }}"
+    group: "{{ syncthing_user }}"
+    mode: "{{ item.mode }}"
+    state: directory
+  loop:
+    - { path: sync, mode: '0755' }
+    - { path: sync/zettel, mode: '0755' }
+    - { path: sync/ids, mode: '0700' }
+
+- name: Add the synced directory to backup
+  cron:
+    name: backup syncthing
+    minute: 0
+    hour: 4
+    job: /root/make_backup Syncthing /opt/sync /home/syncthing/.local/state/syncthing
+
+- name: Restore syncthing
+  when: "'restore' in ansible_run_tags"
+  command:
+    argv:
+      - "/root/extract_backup"
+      - Syncthing
+      - '*'
+    chdir: /
+
+- name: Start syncthing
+  service:
+    name: syncthing
+    state: started
+    enabled: true
+
+- name: Install hooks
+  import_tasks: hooks.yml

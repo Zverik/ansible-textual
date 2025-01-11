@@ -1,0 +1,31 @@
+---
+- name: Check that we don't have cargo
+  stat:
+    path: /usr/local/bin/cargo
+  register: cargo_file
+
+- name: Install cargo package
+  when: false # We need 1.81, in Ubuntu 24.04 only 1.75
+  apt:
+    pkg: cargo
+    state: present
+
+- name: Download cargo tar.xz
+  when: not cargo_file.stat.exists
+  unarchive:
+    remote_src: true
+    src: "{{ rust_url }}"
+    dest: /tmp
+    creates: /tmp/{{ rust_file_name }}/install.sh
+
+- name: Run the installer
+  when: not cargo_file.stat.exists
+  command:
+    cmd: bash install.sh --components=rustc,cargo,rust-std-x86_64-unknown-linux-gnu
+    chdir: /tmp/{{ rust_file_name }}
+    creates: /usr/local/bin/cargo
+
+- name: Delete temporary files
+  file:
+    path: /tmp/{{ rust_file_name }}
+    state: absent

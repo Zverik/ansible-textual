@@ -29,6 +29,7 @@ cert_path:
   shtosm: /etc/letsencrypt/live/shtosm.ru
   tw_shtosm: /etc/letsencrypt/live/shtosm.ru
   nelgi: /etc/letsencrypt/live/nelgi31.ee
+  izvee: /etc/letsencrypt/live/izv.ee
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -70,6 +71,9 @@ certbot_certs:
     domains:
       - shtosm.ru
       - twitter.shtosm.ru
+  - domains:
+      - izv.ee
+      - t.izv.ee
 
 # Needed to add --expand
 certbot_create_command: >-

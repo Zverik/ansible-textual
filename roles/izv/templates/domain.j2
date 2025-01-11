@@ -1,0 +1,66 @@
+{% if izvee_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+  DocumentRoot {{ sites }}/{{ domain }}
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if izvee_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.izvee }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.izvee }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/{{ domain }}>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if izvee_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}
+
+{% if izvee_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName t.{{ domain }}
+  DocumentRoot {{ sites }}/textual.ru/www
+
+  CustomLog /var/log/apache2/t.{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/t.{{ domain }}/error_log
+
+{% if izvee_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.izvee }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.izvee }}/privkey.pem"
+{% endif %}
+
+  <Directory {{ sites }}/textual.ru/www>
+    Options FollowSymLinks Includes MultiViews
+    AllowOverride All
+  </Directory>
+
+  ScriptAlias /cgi-bin/ {{ sites }}/textual.ru/cgi-bin/
+  <Directory {{ sites }}/textual.ru/cgi-bin>
+    Options FollowSymLinks Includes MultiViews ExecCGI
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+{% if izvee_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName t.{{ domain }}
+	Redirect permanent / https://t.{{ domain }}/
+</VirtualHost>
+{% endif %}

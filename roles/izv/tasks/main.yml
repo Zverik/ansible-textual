@@ -1,0 +1,120 @@
+---
+- name: Create directory for Quartz
+  become: yes
+  file:
+    path: /srv/quartz
+    owner: "{{ admin }}"
+    group: syncthing
+    mode: '0775'
+    state: directory
+
+- name: Clone Quartz
+  git:
+    repo: https://github.com/zverik/quartz.git
+    version: izv
+    dest: /srv/quartz
+  notify: rebuild izv
+
+- name: Install Quartz
+  npm:
+    path: /srv/quartz
+    production: true
+
+- name: Grant syncthing group perms for quartz
+  become: yes
+  file:
+    path: /srv/quartz/quartz
+    mode: '0775'
+    group: syncthing
+    state: directory
+
+- name: Fix root caching issues
+  become: yes
+  file:
+    path: /home/syncthing/npm
+    owner: syncthing
+    recurse: true
+    state: directory
+
+- name: Upload updating script
+  become: yes
+  template:
+    src: update_izv.sh.j2
+    dest: /srv/update_izv.sh
+    mode: '0755'
+    owner: syncthing
+
+- name: Add Quartz hook
+  become: yes
+  blockinfile:
+    path: /home/syncthing/.config/stfed/hooks.toml
+    create: true
+    owner: syncthing
+    block: |
+      [[hooks]]
+      folder = "/opt/sync/zettel"
+      event = "folder_down_sync_done"
+      allow_concurrent = false
+      command = "/srv/update_izv.sh"
+  notify:
+    - restart stfed
+    - rebuild izv
+
+- name: Create directory for izv.ee
+  become: yes
+  file:
+    path: "{{ sites }}/{{ domain }}"
+    state: directory
+    owner: syncthing
+    mode: "0775"
+
+- name: Add izv.ee to backup
+  become: yes
+  cron:
+    name: backup izv.ee
+    minute: 0
+    hour: 4
+    job: /root/make_backup Izvee "{{ sites }}/{{ domain }}"
+
+- name: Restore izv.ee
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup"
+      - Izvee
+      - '*'
+    chdir: /
+  notify: rebuild izv
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/{{ item }}
+    state: directory
+    mode: 0755
+    owner: www-data
+  loop:
+    - "{{ domain }}"
+    - "t.{{ domain }}"
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.izvee }}/privkey.pem"
+  register: izvee_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

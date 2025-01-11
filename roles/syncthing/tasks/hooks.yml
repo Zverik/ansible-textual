@@ -1,0 +1,43 @@
+---
+- name: Install Cargo
+  include_tasks: cargo.yml
+
+- name: Check out stfed
+  git:
+    repo: https://github.com/desbma/stfed.git
+    dest: /srv/stfed
+
+- name: Compile stfed
+  command:
+    cmd: cargo build --release
+    chdir: /srv/stfed
+    creates: /srv/stfed/target/release/stfed
+
+- name: Symlink stfed to bin
+  file:
+    src: /srv/stfed/target/release/stfed
+    path: /usr/local/bin/stfed
+    state: link
+
+- name: Install systemd module
+  template:
+    src: stfed.service.j2
+    dest: /etc/systemd/system/stfed.service
+  register: stfed_systemd
+
+- name: Reload modules
+  when: stfed_systemd is changed
+  systemd_service:
+    daemon_reload: true
+
+- name: Check that hooks exist
+  stat:
+    path: /home/syncthing/.config/stfed/hooks.toml
+  register: hooks_file
+
+- name: Start stfed service
+  when: hooks_file.stat.exists
+  service:
+    name: stfed
+    state: started
+    enabled: true
