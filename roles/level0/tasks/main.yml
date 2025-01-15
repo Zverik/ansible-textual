@@ -21,6 +21,15 @@
     state: directory
     owner: www-data
 
+- name: Add database cleanup to cron
+  become: yes
+  cron:
+    name: Clean-up Level0 data
+    user: www-data
+    job: "sqlite3 \"{{ sites }}/osmz.ru/level0/data/level0.db\" \"delete from base where created < datetime('now', '-40 hours')\""
+    minute: "0"
+    hour: "3"
+
 - name: Create apache log directory
   become: yes
   file:

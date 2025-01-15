@@ -46,6 +46,11 @@
     name: revertui job
     job: "cd {{ sites }}/osmz.ru/revert && .venv/bin/python -m revertui.revert_job >> /var/log/apache2/{{domain}}/revert.log 2>&1"
 
+- name: Remove stale lock files with cron
+  cron:
+    name: revertui stale lock
+    job: "find {{ sites }}/osmz.ru/revert/revertui -maxdepth 1 -type f -name lock -cmin +120 -delete"
+
 - name: Add revertui to backup
   become: yes
   cron:
