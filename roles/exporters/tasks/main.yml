@@ -1,0 +1,16 @@
+---
+- name: Open exporter ports
+  ufw:
+    port: "{{ item }}"
+    proto: tcp
+    rule: allow
+  with_items:
+    - 9100
+    - 9104
+  notify: restart ufw
+
+- name: Add mysql superuser for the exporter
+  mysql_user:
+    name: "{{ mysqld_exporter_username }}"
+    password: "{{ mysqld_exporter_password }}"
+    priv: '*.*:ALL'

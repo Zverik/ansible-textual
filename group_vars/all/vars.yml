@@ -72,3 +72,6 @@ letsencrypt_account_key: "{{ v_letsencrypt_account_key }}"
 svn_realm: zverik-realm
 svn_user: "{{ v_svn_user }}"
 svn_password: "{{ v_svn_password }}"
+
+mysqld_exporter_username: exporter
+mysqld_exporter_password: "{{ v_exporter_mysql_password }}"
