@@ -4,7 +4,6 @@
 <VirtualHost *:80>
 {% endif %}
   ServerName {{ domain }}
-  ServerAlias shtosm.textual.ru
   DocumentRoot {{ sites }}/{{ domain }}
 
   CustomLog /var/log/apache2/{{ domain }}/access_log combined
@@ -29,6 +28,13 @@
 <VirtualHost *:80>
   ServerName {{ domain }}
   ServerAlias www.{{ domain }}
+  ServerAlias shtosm.textual.ru
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+
+<VirtualHost *:443>
+  ServerName www.{{ domain }}
+  ServerAlias shtosm.textual.ru
 	Redirect permanent / https://{{ domain }}/
 </VirtualHost>
 {% endif %}
