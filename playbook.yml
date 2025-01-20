@@ -29,6 +29,13 @@
     - { role: svn, tags: svn }
     - { role: znc, tags: znc }
     - { role: syncthing, tags: syncthing }
+  tasks:
+    - name: Restart MySQL when it's down
+      cron:
+        name: restart mysql
+        minute: "9,29,49"
+        job: systemctl start mariadb
+      tags: fix
 
 - hosts: all
   become: yes
