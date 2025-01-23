@@ -52,11 +52,12 @@
     dest: /etc/logrotate.d/apache2
 
 - name: Add certificate backups
-  cron:
-    name: backup certs
-    minute: 0
-    hour: 4
-    job: /root/make_backup TextualCert /etc/letsencrypt
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup TextualCert /etc/letsencrypt
+    regexp: 'make.* TextualCert '
+    state: present
+  tags: backup
 
 - name: Restore certificates
   when: "'restore' in ansible_run_tags"

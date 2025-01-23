@@ -35,11 +35,12 @@
 
 - name: Add radio to backup
   become: yes
-  cron:
-    name: backup radio
-    minute: 0
-    hour: 4
-    job: /root/make_backup_db Radio {{ radio_mysql_db }} "{{ sites }}/osmz.ru/radio/user" "{{ sites }}/osmz.ru/radio/pictures" "{{ sites }}/osmz.ru/radio/podcast"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db Radio {{ radio_mysql_db }} "{{ sites }}/osmz.ru/radio/user" "{{ sites }}/osmz.ru/radio/pictures" "{{ sites }}/osmz.ru/radio/podcast"
+    regexp: 'make.* Radio '
+    state: present
+  tags: backup
 
 - name: Restore radio
   when: "'restore' in ansible_run_tags"

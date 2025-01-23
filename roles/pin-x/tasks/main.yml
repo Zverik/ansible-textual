@@ -8,11 +8,12 @@
 
 - name: Add pin-x to backup
   become: yes
-  cron:
-    name: backup pin-x.ru
-    minute: 0
-    hour: 4
-    job: /root/make_backup PinX "{{ sites }}/pin-x.ru"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup PinX "{{ sites }}/pin-x.ru"
+    regexp: 'make.* PinX '
+    state: present
+  tags: backup
 
 - name: Restore pin-x
   when: "'restore' in ansible_run_tags"

@@ -57,11 +57,12 @@
     - { path: sync/ids, mode: '0700' }
 
 - name: Add the synced directory to backup
-  cron:
-    name: backup syncthing
-    minute: 0
-    hour: 4
-    job: /root/make_backup Syncthing /opt/sync /home/syncthing/.local/state/syncthing
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup Syncthing /opt/sync /home/syncthing/.local/state/syncthing
+    regexp: 'make.* Syncthing '
+    state: present
+  tags: backup
 
 - name: Restore syncthing
   when: "'restore' in ansible_run_tags"

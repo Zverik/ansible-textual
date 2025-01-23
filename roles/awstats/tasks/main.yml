@@ -78,11 +78,12 @@
   notify: reload apache
 
 - name: Add awstats data to backup
-  cron:
-    name: backup awstats
-    minute: 0
-    hour: 4
-    job: /root/make_backup TextualAwStats /var/lib/awstats
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup TextualAwStats /var/lib/awstats
+    regexp: 'make.* TextualAwStats '
+    state: present
+  tags: backup
 
 - name: Restore AWStats
   when: "'restore' in ansible_run_tags"

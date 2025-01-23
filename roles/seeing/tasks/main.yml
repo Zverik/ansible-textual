@@ -28,11 +28,12 @@
 
 - name: Add seeing to backup
   become: yes
-  cron:
-    name: backup seen
-    minute: 0
-    hour: 4
-    job: /root/make_backup_db Seeing {{ seen_mysql_db }} "{{ sites }}/{{ domain }}/user" "{{ sites }}/{{ domain }}/pictures"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db Seeing {{ seen_mysql_db }} "{{ sites }}/{{ domain }}/user" "{{ sites }}/{{ domain }}/pictures"
+    regexp: 'make.* Seeing '
+    state: present
+  tags: backup
 
 - name: Restore seeing
   when: "'restore' in ansible_run_tags"

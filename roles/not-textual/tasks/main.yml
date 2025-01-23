@@ -8,11 +8,12 @@
 
 - name: Add not-textual to backup
   become: yes
-  cron:
-    name: backup not.textual
-    minute: 0
-    hour: 4
-    job: /root/make_backup NotTextual "{{ sites }}/not.textual.ru"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup NotTextual "{{ sites }}/not.textual.ru"
+    regexp: 'make.* NotTextual '
+    state: present
+  tags: backup
 
 - name: Restore not-textual
   when: "'restore' in ansible_run_tags"

@@ -9,11 +9,12 @@
 
 - name: Add sotm-baltics to backup
   become: yes
-  cron:
-    name: backup sotm-baltics
-    minute: 0
-    hour: 4
-    job: /root/make_backup SotmBaltics "{{ sites }}/sotm-baltics.org"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup SotmBaltics "{{ sites }}/sotm-baltics.org"
+    regexp: 'make.* SotmBaltics '
+    state: present
+  tags: backup
 
 - name: Restore sotm-baltics
   when: "'restore' in ansible_run_tags"

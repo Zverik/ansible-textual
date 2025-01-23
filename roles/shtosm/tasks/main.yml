@@ -50,11 +50,12 @@
 
 - name: Add shtosm to backup
   become: yes
-  cron:
-    name: backup shtosm
-    minute: 0
-    hour: 4
-    job: /root/make_backup_db Shtosm {{ shtosm_mysql_db }} "{{ sites }}/{{ domain }}/user" "{{ sites }}/{{ domain }}/pictures"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db Shtosm {{ shtosm_mysql_db }} "{{ sites }}/{{ domain }}/user" "{{ sites }}/{{ domain }}/pictures"
+    regexp: 'make.* Shtosm '
+    state: present
+  tags: backup
 
 - name: Restore shtosm
   when: "'restore' in ansible_run_tags"

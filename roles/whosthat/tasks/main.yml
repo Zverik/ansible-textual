@@ -59,11 +59,12 @@
 
 - name: Add whosthat to backup
   become: yes
-  cron:
-    name: backup whosthat
-    minute: 0
-    hour: 4
-    job: /root/make_backup_db WhosThat {{ whosthat_mysql_db }}
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db WhosThat {{ whosthat_mysql_db }}
+    regexp: 'make.* WhosThat '
+    state: present
+  tags: backup
 
 - name: Restore whosthat
   when: "'restore' in ansible_run_tags"

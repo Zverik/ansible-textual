@@ -60,11 +60,12 @@
     daemon_reload: true
 
 - name: Add the svn directory to backup
-  cron:
-    name: backup svnrepo
-    minute: 0
-    hour: 4
-    job: /root/make_backup Svn /var/svn/svnrepo
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup Svn /var/svn/svnrepo
+    regexp: 'make.* Svn '
+    state: present
+  tags: backup
 
 - name: Restore SVN
   when: "'restore' in ansible_run_tags"

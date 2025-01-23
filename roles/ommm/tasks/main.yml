@@ -23,11 +23,12 @@
 
 - name: Add presentations to backup
   become: true
-  cron:
-    name: backup ommm
-    minute: 0
-    hour: 4
-    job: /root/make_backup OMMM "{{ sites }}/osmz.ru/ommm/pres"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup OMMM "{{ sites }}/osmz.ru/ommm/pres"
+    regexp: 'make.* OMMM '
+    state: present
+  tags: backup
 
 - name: Restore presentations from backup
   when: "'restore' in ansible_run_tags"

@@ -6,11 +6,12 @@
 
 - name: Add zverev.info to backup
   become: yes
-  cron:
-    name: backup zverev.info
-    minute: 0
-    hour: 4
-    job: /root/make_backup Zverev "{{ sites }}/zverev.info"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup Zverev "{{ sites }}/zverev.info"
+    regexp: 'make.* Zverev '
+    state: present
+  tags: backup
 
 - name: Restore zverev.info
   when: "'restore' in ansible_run_tags"

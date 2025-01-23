@@ -68,25 +68,6 @@
     owner: syncthing
     mode: "0775"
 
-- name: Add izv.ee to backup
-  become: yes
-  cron:
-    name: backup izv.ee
-    minute: 0
-    hour: 4
-    job: /root/make_backup Izvee "{{ sites }}/{{ domain }}"
-
-- name: Restore izv.ee
-  when: "'restore' in ansible_run_tags"
-  become: yes
-  command:
-    argv:
-      - "/root/extract_backup"
-      - Izvee
-      - '*'
-    chdir: /
-  notify: rebuild izv
-
 - name: Create apache log directory
   become: yes
   file:

@@ -55,11 +55,12 @@
 
 - name: Add nelgi to backup
   become: yes
-  cron:
-    name: backup nelgi
-    minute: 0
-    hour: 4
-    job: /root/make_backup_db Nelgi {{ nelgi_mysql_db }} "{{ sites }}/{{ domain }}/storage/uploads" "{{ sites }}/{{ domain }}/public/uploads"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db Nelgi {{ nelgi_mysql_db }} "{{ sites }}/{{ domain }}/storage/uploads" "{{ sites }}/{{ domain }}/public/uploads"
+    regexp: 'make.* Nelgi '
+    state: present
+  tags: backup
 
 - name: Restore nelgi
   when: "'restore' in ansible_run_tags"

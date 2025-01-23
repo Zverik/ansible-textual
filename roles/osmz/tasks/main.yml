@@ -17,11 +17,12 @@
 
 - name: Add osmz to backup
   become: yes
-  cron:
-    name: backup osmz www
-    minute: 0
-    hour: 4
-    job: /root/make_backup Osmz "{{ sites }}/osmz.ru/www"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup Osmz "{{ sites }}/osmz.ru/www"
+    regexp: 'make.* Osmz '
+    state: present
+  tags: backup
 
 - name: Restore osmz from backup
   when: "'restore' in ansible_run_tags"

@@ -13,11 +13,12 @@
 
 - name: Add josm changelog to backup
   become: yes
-  cron:
-    name: backup josm changelog
-    minute: 0
-    hour: 4
-    job: /root/make_backup Josm "{{ sites }}/{{ domain }}/changelog.txt"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup Josm "{{ sites }}/{{ domain }}/changelog.txt"
+    regexp: 'make.* Josm '
+    state: present
+  tags: backup
 
 - name: Restore josm changelog
   when: "'restore' in ansible_run_tags"

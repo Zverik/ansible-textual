@@ -1,10 +1,10 @@
 ---
 - name: Add backing up home to crontab
-  cron:
-    name: backup home
-    minute: 0
-    hour: 4
-    job: /root/make_backup TextualHome /home
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup TextualHome /home
+    regexp: 'make.* TextualHome '
+    state: present
 
 - name: Restore home
   when: "'restore' in ansible_run_tags"

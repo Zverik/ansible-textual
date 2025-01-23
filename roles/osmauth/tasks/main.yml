@@ -37,11 +37,12 @@
 
 - name: Add osmauth to backup
   become: yes
-  cron:
-    name: backup osmauth
-    minute: 0
-    hour: 4
-    job: /root/make_backup_db OsmAuth {{ osmauth_mysql_db }}
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db OsmAuth {{ osmauth_mysql_db }}
+    regexp: 'make.* OsmAuth '
+    state: present
+  tags: backup
 
 - name: Restore osmauth
   when: "'restore' in ansible_run_tags"

@@ -41,5 +41,12 @@
     - extract_backup
     - extract_backup_db
 
+- name: Create template for the backup file
+  copy:
+    content: '#!/bin/bash'
+    dest: /etc/cron.daily/backup
+    mode: 0744
+    force: false
+
 - name: Set up home backups
   import_tasks: home.yml

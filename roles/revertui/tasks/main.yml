@@ -53,11 +53,12 @@
 
 - name: Add revertui to backup
   become: yes
-  cron:
-    name: backup revertui
-    minute: 0
-    hour: 4
-    job: /root/make_backup RevertUI "{{ sites }}/osmz.ru/revert/revertui/revertui.db"
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup RevertUI "{{ sites }}/osmz.ru/revert/revertui/revertui.db"
+    regexp: 'make.* RevertUI '
+    state: present
+  tags: backup
 
 - name: Restore revertui
   when: "'restore' in ansible_run_tags"

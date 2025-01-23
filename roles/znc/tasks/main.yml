@@ -5,11 +5,12 @@
     state: present
 
 - name: Add znc to backup
-  cron:
-    name: backup znc
-    minute: 0
-    hour: 4
-    job: /root/make_backup Znc /var/lib/znc
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup Znc /var/lib/znc
+    regexp: 'make.* Znc '
+    state: present
+  tags: backup
 
 - name: Restore znc
   when: "'restore' in ansible_run_tags"
