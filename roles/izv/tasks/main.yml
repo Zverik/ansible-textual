@@ -68,6 +68,14 @@
     owner: syncthing
     mode: "0775"
 
+- name: Upload .htaccess
+  copy:
+    src: htaccess
+    dest: "{{ sites }}/{{ domain }}/.htaccess"
+
+- name: Install content mangler
+  include_tasks: quixotic.yml
+
 - name: Create apache log directory
   become: yes
   file:
@@ -99,3 +107,10 @@
     dest: /etc/apache2/sites-enabled/{{ domain }}.conf
     state: link
   notify: reload apache
+
+- name: Enable apache mod_rewrite
+  become: yes
+  apache2_module:
+    name: rewrite
+    state: present
+  notify: restart apache

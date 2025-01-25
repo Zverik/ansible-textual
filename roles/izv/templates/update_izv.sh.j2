@@ -2,3 +2,13 @@
 set -e -u
 cd /srv/quartz
 npx quartz build -d /opt/sync/zettel/izv -o {{ sites }}/{{ domain }}
+QUIXOTIC=/srv/quixotic/target/release/quixotic
+if [ -e "$QUIXOTIC" ]; then
+  rm -rf /tmp/izv_fake || true
+  mkdir /tmp/izv_fake
+  # Currently fails on files w/o extension, so back htaccess up
+  mv "{{ sites }}/{{ domain }}/.htaccess" "{{ sites }}/{{ domain }}/.htaccess.tmp"
+  "$QUIXOTIC" --input "{{ sites }}/{{ domain }}" --output "/tmp/izv_fake" || true
+  mv "{{ sites }}/{{ domain }}/.htaccess.tmp" "{{ sites }}/{{ domain }}/.htaccess"
+  mv /tmp/izv_fake "{{ sites }}/{{ domain }}/fake"
+fi

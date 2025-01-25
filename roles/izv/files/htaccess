@@ -1,0 +1,29 @@
+RewriteEngine On
+ 
+ErrorDocument 404 /404.html
+
+<If "%{HTTP_USER_AGENT} =~ /^.*(AI2Bot|Ai2Bot-Dolma|Amazonbot|anthropic-ai|Applebot|Applebot-Extended|Bytespider|CCBot|ChatGPT-User|Claude-Web|ClaudeBot|cohere-ai|cohere-training-data-crawler|Crawlspace|Diffbot|DuckAssistBot|FacebookBot|FriendlyCrawler|Google-Extended|GoogleOther|GoogleOther-Image|GoogleOther-Video|GPTBot|iaskspider.2.0|ICC-Crawler|ImagesiftBot|img2dataset|ISSCyberRiskCrawler|Kangaroo Bot|Meta-ExternalAgent|Meta-ExternalFetcher|OAI-SearchBot|omgili|omgilibot|PanguBot|PerplexityBot|PetalBot|Scrapy|SemrushBot|Sidetrade indexer bot|Timpibot|VelenPublicWebCrawler|Webzio-Extended|YouBot).*$/">
+  RewriteCond %{DOCUMENT_ROOT}/fake/%{REQUEST_URI} -f
+  RewriteRule ^(.*)$ /fake/%{REQUEST_URI} [L]
+
+  # Rewrite rule for .html extension removal (with directory check)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/fake/%{REQUEST_URI}.html -f
+  RewriteRule ^(.*)$ /fake/$1.html [L]
+   
+  # Handle directory requests explicitly
+  RewriteCond %{DOCUMENT_ROOT}/fake/%{REQUEST_FILENAME} -d
+  RewriteRule ^(.*)/$ /fake/$1/index.html [L]
+</If>
+<Else>
+  # Rewrite rule for .html extension removal (with directory check)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_URI}.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+   
+  # Handle directory requests explicitly
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^(.*)/$ $1/index.html [L]
+</Else>

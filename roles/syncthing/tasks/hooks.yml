@@ -6,12 +6,15 @@
   git:
     repo: https://github.com/desbma/stfed.git
     dest: /srv/stfed
+  register: stfed_repo
 
 - name: Compile stfed
+  when: stfed_repo is changed
   command:
     cmd: cargo build --release
     chdir: /srv/stfed
     creates: /srv/stfed/target/release/stfed
+  notify: restart stfed
 
 - name: Symlink stfed to bin
   file:

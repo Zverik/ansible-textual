@@ -1,0 +1,28 @@
+---
+- name: Create directory for Quixotic
+  become: yes
+  file:
+    path: /srv/quixotic
+    state: directory
+    owner: "{{ admin }}"
+
+- name: Check out Quixotic
+  git:
+    repo: https://github.com/marcus0x62/quixotic.git
+    dest: /srv/quixotic
+  register: quixotic_git
+
+- name: Compile Quixotic
+  when: quixotic_git is changed
+  command:
+    cmd: cargo build --release
+    chdir: /srv/quixotic
+    creates: /srv/quixotic/target/release/quixotic
+
+- name: Create directory for izv.ee fakes
+  become: yes
+  file:
+    path: "{{ sites }}/{{ domain }}_fake"
+    state: directory
+    owner: syncthing
+    mode: "0775"
