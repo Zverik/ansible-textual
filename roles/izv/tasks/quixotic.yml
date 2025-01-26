@@ -17,7 +17,6 @@
   command:
     cmd: cargo build --release
     chdir: /srv/quixotic
-    creates: /srv/quixotic/target/release/quixotic
 
 - name: Create directory for izv.ee fakes
   become: yes
