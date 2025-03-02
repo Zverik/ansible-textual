@@ -4,7 +4,7 @@ certbot_create_method: standalone
 certbot_create_standalone_stop_services: [apache2]
 
 cert_path:
-  josm: /etc/letsencrypt/live/josm.ru
+  josm: /etc/letsencrypt/live/josm.osmz.ru
   izverev: /etc/letsencrypt/live/josm.ru
   sotm: /etc/letsencrypt/live/josm.ru
   textual: /etc/letsencrypt/live/textual.ru
@@ -64,6 +64,9 @@ certbot_certs:
       - awards.osmz.ru
       - sotm.osmz.ru
       - streak.osmz.ru
+  - email: ilya@zverev.info
+    domains:
+      - josm.osmz.ru
   - email: ilya@zverev.info
     domains:
       - nelgi31.ee

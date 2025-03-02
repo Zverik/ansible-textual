@@ -3,7 +3,8 @@
 {% else %}
 <VirtualHost *:80>
 {% endif %}
-  ServerName {{ domain }}
+  ServerName josm.osmz.ru
+  ServerAlias josm.osmz.ee
   DocumentRoot {{ sites }}/{{ domain }}
 
   CustomLog /var/log/apache2/{{ domain }}/access_log combined
@@ -24,7 +25,23 @@
 {% if josm_cert.stat.exists %}
 <VirtualHost *:80>
   ServerName {{ domain }}
+  ServerAlias josm.osmz.ru
   ServerAlias www.{{ domain }}
-	Redirect permanent / https://{{ domain }}/
+	Redirect permanent / https://josm.osmz.ru/
+</VirtualHost>
+
+<VirtualHost *:443>
+	ServerName josm.ru
+	Redirect permanent / https://josm.osmz.ru/
+
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.sotm }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.sotm }}/privkey.pem"
+</VirtualHost>
+{% else %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / http://josm.osmz.ru/
 </VirtualHost>
 {% endif %}
