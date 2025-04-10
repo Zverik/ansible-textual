@@ -87,8 +87,8 @@
 
 {% if osmz_cert.stat.exists %}
   SSLEngine on
-  SSLCertificateFile "{{ cert_path.osmz }}/fullchain.pem"
-  SSLCertificateKeyFile "{{ cert_path.osmz }}/privkey.pem"
+  SSLCertificateFile "{{ cert_path.osmzee }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.osmzee }}/privkey.pem"
 {% endif %}
 
 	<Directory {{ sites }}/osmz.ru/www>

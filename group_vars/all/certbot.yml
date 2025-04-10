@@ -30,6 +30,7 @@ cert_path:
   tw_shtosm: /etc/letsencrypt/live/shtosm.ru
   nelgi: /etc/letsencrypt/live/nelgi31.ee
   izvee: /etc/letsencrypt/live/izv.ee
+  osmzee: /etc/letsencrypt/live/osmz.ee
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -77,6 +78,21 @@ certbot_certs:
   - domains:
       - izv.ee
       - t.izv.ee
+  - email: ilya@zverev.info
+    domains:
+      - osmz.ee
+      - level0.osmz.ee
+      - revert.osmz.ee
+      - radio.osmz.ee
+      - auth.osmz.ee
+      - whosthat.osmz.ee
+      - ommm.osmz.ee
+      - bigmap.osmz.ee
+      - audit.osmz.ee
+      - awards.osmz.ee
+      - sotm.osmz.ee
+      - streak.osmz.ee
+      - josm.osmz.ee
 
 # Needed to add --expand
 certbot_create_command: >-
