@@ -31,6 +31,7 @@ cert_path:
   nelgi: /etc/letsencrypt/live/nelgi31.ee
   izvee: /etc/letsencrypt/live/izv.ee
   osmzee: /etc/letsencrypt/live/osmz.ee
+  mpd: /etc/letsencrypt/live/pie.osmz.ee
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -93,6 +94,8 @@ certbot_certs:
       - sotm.osmz.ee
       - streak.osmz.ee
       - josm.osmz.ee
+  - domains:
+      - pie.osmz.ee
 
 # Needed to add --expand
 certbot_create_command: >-

@@ -64,7 +64,7 @@
 - name: Enable and start osmstreak systemd module
   become: yes
   systemd:
-    name: revertui
+    name: osmstreak
     enabled: yes
     daemon_reload: true
     state: started

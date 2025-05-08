@@ -66,6 +66,7 @@
     - { role: bigmap, tags: bigmap }
     - { role: schedules, tags: sotm }
     - { role: osmstreak, tags: streak }
+    - { role: mpd, tags: mpd }
     # - cf_audit
     # - awards
 

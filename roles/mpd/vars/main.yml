@@ -1,0 +1,3 @@
+---
+domain: pie.osmz.ee
+mpd_instance: "{{ sites }}/osmz.ru/mpd/var/mpd-instance"

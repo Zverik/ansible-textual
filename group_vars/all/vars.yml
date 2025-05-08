@@ -64,6 +64,10 @@ osmstreak_client_secret: "{{ v_osmstreak_client_secret }}"
 osmstreak_telegram_token: "{{ v_osmstreak_telegram_token }}"
 osmstreak_secret: "{{ v_osmstreak_secret }}"
 
+mpd_client_id: "{{ v_mpd_client_id }}"
+mpd_client_secret: "{{ v_mpd_client_secret }}"
+mpd_secret: "{{ v_mpd_secret }}"
+
 piwik_db_password: "{{ v_piwik_db_password }}"
 piwik_salt: "{{ v_piwik_salt }}"
 

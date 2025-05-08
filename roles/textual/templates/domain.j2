@@ -1,3 +1,14 @@
+<VirtualHost *:80>
+  ServerName homedash.{{ domain }}
+  DocumentRoot {{ sites }}/{{ domain }}/www/homedash
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+  <Directory {{ sites }}/{{ domain }}/www/homedash>
+    Require all granted
+  </Directory>
+</VirtualHost>
+
 {% if textual_cert.stat.exists %}
 <VirtualHost *:443>
 {% else %}

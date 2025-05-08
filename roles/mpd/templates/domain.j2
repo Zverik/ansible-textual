@@ -1,0 +1,29 @@
+{% if mpd_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+
+  ProxyPass / http://localhost:{{ mpd_port }}/
+  ProxyPassReverse / http://localhost:{{ mpd_port }}/
+  RequestHeader set X-Forwarded-Proto https
+  RequestHeader set X-Forwarded-Prefix /
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if mpd_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.mpd }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.mpd }}/privkey.pem"
+{% endif %}
+</VirtualHost>
+
+{% if mpd_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}

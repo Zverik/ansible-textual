@@ -1,0 +1,17 @@
+[Unit]
+Description=Mapping Pie Dispencer
+After=syslog.target
+
+[Service]
+Type=simple
+Restart=on-failure
+User=zverik
+Group=zverik
+WorkingDirectory={{ sites }}/osmz.ru/mpd
+ExecStart={{ sites }}/osmz.ru/mpd/bin/gunicorn -w 2 -b 0.0.0.0:{{ mpd_port }} 'mpd:create_app()'
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/var/log/apache2/{{ domain }}/py-stdout.log
+StandardError=append:/var/log/apache2/{{ domain }}/py-stderr.log
+
+[Install]
+WantedBy=multi-user.target
