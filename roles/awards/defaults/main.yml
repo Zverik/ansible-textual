@@ -1,0 +1,8 @@
+---
+awards_port: 3006
+awards_mysql_db: osmvoting
+awards_mysql_user: osmvoting
+awards_mysql_password: ""
+awards_oauth_id: ""
+awards_oauth_secret: ""
+awards_secret: "secret"

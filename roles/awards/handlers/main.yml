@@ -1,0 +1,17 @@
+---
+- name: reload apache
+  become: yes
+  systemd: name=apache2 state=reloaded
+
+- name: restart awards
+  become: yes
+  systemd:
+    name: awards
+    state: restarted
+
+- name: drestart awards
+  become: yes
+  systemd:
+    name: awards
+    daemon_reload: true
+    state: restarted

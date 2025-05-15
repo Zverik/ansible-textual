@@ -1,0 +1,17 @@
+[Unit]
+Description=OSM Awards
+After=syslog.target
+
+[Service]
+Type=simple
+Restart=on-failure
+User=zverik
+Group=zverik
+WorkingDirectory={{ sites }}/osmz.ru/awards
+ExecStart={{ sites }}/osmz.ru/awards/venv/bin/gunicorn -w 2 -b 0.0.0.0:{{ awards_port }} www:app
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/var/log/apache2/{{ domain }}/py-stdout.log
+StandardError=append:/var/log/apache2/{{ domain }}/py-stderr.log
+
+[Install]
+WantedBy=multi-user.target

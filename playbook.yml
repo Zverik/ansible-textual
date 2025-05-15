@@ -67,8 +67,8 @@
     - { role: schedules, tags: sotm }
     - { role: osmstreak, tags: streak }
     - { role: mpd, tags: mpd }
+    - { role: awards, tags: awards }
     # - cf_audit
-    # - awards
 
     # other
     - { role: zverev, tags: zverev }

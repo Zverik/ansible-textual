@@ -1,0 +1,10 @@
+DEBUG = False
+PROXY = True
+OAUTH_KEY = '{{ awards_oauth_id }}'
+OAUTH_SECRET = '{{ awards_oauth_secret }}'
+SECRET_KEY = '{{ awards_secret }}'
+DATABASE_URI = "mysql://{{ awards_mysql_user }}:{{ awards_mysql_password }}@localhost/{{ awards_mysql_db }}"
+STAGE = 'call'  # call -> callvote -> select -> voting -> processing -> results
+ADMINS = set([290271, 496201])  # Zverik, Nakaner
+TEAM = set(ADMINS)
+# TEAM = set([290271, 13010, 5164, 95488, 355617, 8909, 999, 360183, 2381194, 2585, 411244, 7630, 8458, 1296916, 4435, 493235])

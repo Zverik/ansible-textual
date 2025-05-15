@@ -64,6 +64,11 @@ osmstreak_client_secret: "{{ v_osmstreak_client_secret }}"
 osmstreak_telegram_token: "{{ v_osmstreak_telegram_token }}"
 osmstreak_secret: "{{ v_osmstreak_secret }}"
 
+awards_mysql_password: "{{ v_awards_mysql_password }}"
+awards_oauth_id: "{{ v_awards_oauth_id }}"
+awards_oauth_secret: "{{ v_awards_oauth_secret }}"
+awards_secret: "{{ v_awards_secret }}"
+
 mpd_client_id: "{{ v_mpd_client_id }}"
 mpd_client_secret: "{{ v_mpd_client_secret }}"
 mpd_secret: "{{ v_mpd_secret }}"

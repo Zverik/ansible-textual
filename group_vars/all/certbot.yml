@@ -23,7 +23,7 @@ cert_path:
   auth: /etc/letsencrypt/live/osmz.ru
   bigmap: /etc/letsencrypt/live/osmz.ru
   audit: /etc/letsencrypt/live/osmz.ru
-  awards: /etc/letsencrypt/live/osmz.ru
+  awards: /etc/letsencrypt/live/osmz.ee
   schedules: /etc/letsencrypt/live/osmz.ru
   streak: /etc/letsencrypt/live/osmz.ru
   shtosm: /etc/letsencrypt/live/shtosm.ru

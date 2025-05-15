@@ -1,0 +1,111 @@
+---
+- name: Check out osmawards
+  git:
+    repo: https://github.com/Zverik/osmvoting
+    dest: "{{ sites }}/osmz.ru/awards"
+  notify: restart awards
+
+- name: Upload config
+  template:
+    src: config_local.py.j2
+    dest: "{{ sites }}/osmz.ru/awards/config_local.py"
+  notify: restart awards
+
+- name: Create virtualenv for awards
+  pip:
+    requirements: "{{ sites }}/osmz.ru/awards/requirements.txt"
+    virtualenv: "{{ sites }}/osmz.ru/awards/venv"
+
+- name: Create awards mysql db
+  become: true
+  mysql_db:
+    name: "{{ awards_mysql_db }}"
+    state: present
+  register: create_db
+
+- name: Create awards mysql user
+  become: true
+  mysql_user:
+    name: "{{ awards_mysql_user }}"
+    password: "{{ awards_mysql_password }}"
+    priv: "{{ awards_mysql_db }}.*:ALL"
+
+- name: Migrate DB
+  when: create_db is changed
+  command:
+    chdir: "{{ sites }}/osmz.ru/awards"
+    argv:
+      - venv/bin/python
+      - -c
+      - "from www import db; db.create_tables()"
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0775
+    owner: zverik
+    group: www-data
+
+- name: Create systemd service
+  become: yes
+  template:
+    src: awards.service
+    dest: /etc/systemd/system/
+  notify: drestart awards
+
+- name: Enable and start awards systemd module
+  become: yes
+  systemd:
+    name: awards
+    enabled: yes
+    daemon_reload: true
+    state: started
+
+- name: Add awards to backup
+  become: yes
+  lineinfile:
+    path: /etc/cron.daily/backup
+    line: /root/make_backup_db Awards {{ awards_mysql_db }}
+    regexp: 'make.* Awards '
+    state: present
+  tags: backup
+
+- name: Restore awards
+  when: "'restore' in ansible_run_tags"
+  become: yes
+  command:
+    argv:
+      - "/root/extract_backup_db"
+      - Awards
+      - "{{ awards_mysql_db }}"
+      - '*'
+    chdir: /
+
+- name: Ensure http_proxy is enabled
+  become: yes
+  apache2_module:
+    name: proxy_http
+    state: present
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.awards }}/privkey.pem"
+  register: awards_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache
