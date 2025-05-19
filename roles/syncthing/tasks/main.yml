@@ -55,6 +55,7 @@
     - { path: sync, mode: '0755' }
     - { path: sync/zettel, mode: '0755' }
     - { path: sync/ids, mode: '0700' }
+    - { path: sync/ak, mode: '0700' }
 
 - name: Add the synced directory to backup
   lineinfile:
