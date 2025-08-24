@@ -6,3 +6,8 @@ awards_mysql_password: ""
 awards_oauth_id: ""
 awards_oauth_secret: ""
 awards_secret: "secret"
+
+# call -> callvote -> select -> voting -> processing -> results
+awards_stage: call
+awards_admins: [290271]
+awards_team: [290271]

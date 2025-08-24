@@ -5,8 +5,8 @@ certbot_create_standalone_stop_services: [apache2]
 
 cert_path:
   josm: /etc/letsencrypt/live/josm.osmz.ru
-  izverev: /etc/letsencrypt/live/josm.ru
-  sotm: /etc/letsencrypt/live/josm.ru
+  izverev: /etc/letsencrypt/live/zverev.info
+  sotm: /etc/letsencrypt/live/sotm-baltics.org
   textual: /etc/letsencrypt/live/textual.ru
   not: /etc/letsencrypt/live/textual.ru
   pinx: /etc/letsencrypt/live/textual.ru
@@ -23,7 +23,7 @@ cert_path:
   auth: /etc/letsencrypt/live/osmz.ru
   bigmap: /etc/letsencrypt/live/osmz.ru
   audit: /etc/letsencrypt/live/osmz.ru
-  awards: /etc/letsencrypt/live/osmz.ee
+  awards: /etc/letsencrypt/live/awards.osmz.ee
   schedules: /etc/letsencrypt/live/osmz.ru
   streak: /etc/letsencrypt/live/osmz.ru
   shtosm: /etc/letsencrypt/live/shtosm.ru
@@ -36,9 +36,10 @@ cert_path:
 certbot_certs:
   - email: ilya@zverev.info
     domains:
-      - josm.ru
       - zverev.info
       - ilya.zverev.info
+  - email: ilya@zverev.info
+    domains:
       - sotm-baltics.org
       - 2013.sotm-baltics.org
   - email: ilya@zverev.info
@@ -90,12 +91,16 @@ certbot_certs:
       - ommm.osmz.ee
       - bigmap.osmz.ee
       - audit.osmz.ee
-      - awards.osmz.ee
       - sotm.osmz.ee
       - streak.osmz.ee
       - josm.osmz.ee
   - domains:
       - pie.osmz.ee
+  - domains:
+      - awards.osmz.ee
+      - awards.osmz.ru
+      - awards.openstreetmap.org
+      - awards.osm.org
 
 # Needed to add --expand
 certbot_create_command: >-

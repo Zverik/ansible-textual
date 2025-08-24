@@ -4,6 +4,8 @@
 <VirtualHost *:80>
 {% endif %}
   ServerName {{ domain }}
+  ServerAlias awards.openstreetmap.org
+  ServerAlias awards.osm.org
 
   ProxyPass / http://localhost:{{ awards_port }}/
   ProxyPassReverse / http://localhost:{{ awards_port }}/
@@ -24,11 +26,15 @@
 <VirtualHost *:80>
   ServerName {{ domain }}
   ServerAlias www.{{ domain }}
+  ServerAlias awards.osmz.ru
+  ServerAlias awards.openstreetmap.org
+  ServerAlias awards.osm.org
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+
+<VirtualHost *:443>
+  ServerName www.{{ domain }}
+  ServerAlias awards.osmz.ru
 	Redirect permanent / https://{{ domain }}/
 </VirtualHost>
 {% endif %}
-
-<VirtualHost *:80>
-  ServerName awards.osmz.ru
-	Redirect permanent / https://{{ domain }}/
-</VirtualHost>

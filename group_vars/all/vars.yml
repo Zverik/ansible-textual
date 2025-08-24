@@ -68,6 +68,9 @@ awards_mysql_password: "{{ v_awards_mysql_password }}"
 awards_oauth_id: "{{ v_awards_oauth_id }}"
 awards_oauth_secret: "{{ v_awards_oauth_secret }}"
 awards_secret: "{{ v_awards_secret }}"
+# call -> callvote -> select -> voting -> processing -> results
+awards_stage: select
+awards_team: [290271]
 
 mpd_client_id: "{{ v_mpd_client_id }}"
 mpd_client_secret: "{{ v_mpd_client_secret }}"
