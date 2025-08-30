@@ -57,6 +57,14 @@
     dest: /etc/cron.hourly
     mode: 0755
 
+- name: Set up database dump every week
+  cron:
+    name: whosthat dump
+    minute: "0"
+    hour: "3"
+    weekday: "1"
+    job: "/usr/bin/mariadb-dump -u {{ whosthat_mysql_user }} '-p{{ whosthat_mysql_password }}' {{ whosthat_mysql_db }} > /tmp/whosthat-dump.sql && tar -czf \"{{ sites }}/osmz.ru/whosthat/www/whosthat.tgz\" /tmp/whosthat-dump.sql \"{{ sites }}/osmz.ru/whosthat/scripts/state.txt\" && rm /tmp/whosthat-dump.sql"
+
 - name: Add whosthat to backup
   become: yes
   lineinfile:
