@@ -68,6 +68,7 @@
     - { role: osmstreak, tags: streak }
     - { role: mpd, tags: mpd }
     - { role: awards, tags: awards }
+    - { role: mpt, tags: mpt }
     # - cf_audit
 
     # other

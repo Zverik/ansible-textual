@@ -1,0 +1,11 @@
+---
+mpt_port: 3008
+
+mpt_mysql_db: mpt
+mpt_mysql_user: mpt
+mpt_mysql_password: ""
+
+mpt_osm_client: ""
+mpt_osm_secret: ""
+
+mpt_secret: SomethingRandom

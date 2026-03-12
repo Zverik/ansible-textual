@@ -1,0 +1,7 @@
+---
+- name: restart mpt
+  become: yes
+  systemd:
+    name: mpt
+    state: restarted
+

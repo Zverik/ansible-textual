@@ -87,3 +87,8 @@ svn_password: "{{ v_svn_password }}"
 
 mysqld_exporter_username: exporter
 mysqld_exporter_password: "{{ v_exporter_mysql_password }}"
+
+mpt_osm_client: "{{ v_mpt_osm_client }}"
+mpt_osm_secret: "{{ v_mpt_osm_secret }}"
+mpt_mysql_password: "{{ v_mpt_mysql_password }}"
+mpt_secret: "{{ v_mpt_secret }}"

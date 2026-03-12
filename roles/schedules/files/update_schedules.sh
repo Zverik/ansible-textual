@@ -23,4 +23,4 @@ wget -q -r -O "$DATA/sotmeu25.json" 'https://pretalx.com/sotmeu2025/schedule/exp
 #wget -q -r -O "$DATA/fe2025add.csv" 'https://docs.google.com/spreadsheets/d/16e1-O50NeLmNfQEI-hrNVnPdxaNsQw0eoNSPcRDpf9Q/gviz/tq?tqx=out:csv'
 
 SC="$VENV/bin/schedule_convert"
-$SC $DATA/sotmeu25.ini $DATA/sotmeu25.json -l "$WWW" "$BASEURL/sotmeu2025"
+$SC $DATA/sotmeu25.ini $DATA/sotmeu25.json -l "$WWW" "$BASEURL/sotmeu25"

@@ -1,0 +1,32 @@
+{% if mpt_cert.stat.exists %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName {{ domain }}
+
+  ProxyPreserveHost On
+  ProxyPass /ws/ ws://localhost:{{ mpt_port }}/ws/
+  ProxyPassReverse /ws/ ws://localhost:{{ mpt_port }}/ws/
+  ProxyPass / http://localhost:{{ mpt_port }}/
+  ProxyPassReverse / http://localhost:{{ mpt_port }}/
+  RequestHeader set X-Forwarded-Proto https
+  RequestHeader set X-Forwarded-Prefix /
+
+  CustomLog /var/log/apache2/{{ domain }}/access_log combined
+  ErrorLog /var/log/apache2/{{ domain }}/error_log
+
+{% if mpt_cert.stat.exists %}
+  SSLEngine on
+  SSLCertificateFile "{{ cert_path.mpt }}/fullchain.pem"
+  SSLCertificateKeyFile "{{ cert_path.mpt }}/privkey.pem"
+{% endif %}
+</VirtualHost>
+
+{% if mpt_cert.stat.exists %}
+<VirtualHost *:80>
+  ServerName {{ domain }}
+  ServerAlias www.{{ domain }}
+	Redirect permanent / https://{{ domain }}/
+</VirtualHost>
+{% endif %}
