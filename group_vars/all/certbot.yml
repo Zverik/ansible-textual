@@ -33,6 +33,7 @@ cert_path:
   osmzee: /etc/letsencrypt/live/osmz.ee
   mpd: /etc/letsencrypt/live/pie.osmz.ee
   mpt: /etc/letsencrypt/live/mpt.osmz.ee
+  rattateed: /etc/letsencrypt/live/rattateed.osmz.ee
 
 certbot_certs:
   - email: ilya@zverev.info
@@ -104,6 +105,8 @@ certbot_certs:
       - awards.osm.org
   - domains:
       - mpt.osmz.ee
+  - domains:
+      - rattateed.osmz.ee
 
 # Needed to add --expand
 certbot_create_command: >-

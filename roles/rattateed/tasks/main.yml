@@ -1,0 +1,55 @@
+---
+- name: Install osmium and tippecanoe
+  become: yes
+  apt:
+    name:
+      - osmium-tool
+      - tippecanoe
+    state: present
+
+- name: Check out rattateed
+  git:
+    repo: https://github.com/Zverik/toelised-rattateed.git
+    dest: "{{ sites }}/osmz.ru/rattateed"
+
+- name: Upload the official paths pmtiles
+  copy:
+    src: ametlikud-rattateed.pmtiles
+    dest: "{{ sites }}/osmz.ru/rattateed/web"
+
+- name: Add crontab for rattateed
+  cron:
+    name: rattateed
+    state: present
+    job: "cd {{ sites }}/osmz.ru/rattateed/data; ./prepare.sh; rm *.pbf; mv *.pmtiles ../web/"
+    minute: "10"
+    hour: "3"
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: "/var/log/apache2/{{ domain }}"
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.rattateed }}/privkey.pem"
+  register: rattateed_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

@@ -69,6 +69,7 @@
     - { role: mpd, tags: mpd }
     - { role: awards, tags: awards }
     - { role: mpt, tags: mpt }
+    - { role: rattateed, tags: rattateed }
     # - cf_audit
 
     # other
