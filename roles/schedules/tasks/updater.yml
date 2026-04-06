@@ -27,6 +27,7 @@
     dest: /opt/src/schedule-convert/data
   with_fileglob:
     - "*.ini"
+    - "*.xml"
   register: files_updated
 
 - name: Set up crontab for the updated
