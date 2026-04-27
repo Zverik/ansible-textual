@@ -17,13 +17,24 @@
     src: ametlikud-rattateed.pmtiles
     dest: "{{ sites }}/osmz.ru/rattateed/web"
 
+- name: Create diffs directory
+  file:
+    path: "{{ sites }}/osmz.ru/rattateed/web/diffs"
+    state: directory
+    mode: "0777"
+
+- name: Upload htaccess for diffs
+  copy:
+    src: diffs-htaccess
+    dest: "{{ sites }}/osmz.ru/rattateed/web/diffs/.htaccess"
+
 - name: Add crontab for rattateed
   cron:
     name: rattateed
     state: present
     job: "cd {{ sites }}/osmz.ru/rattateed/data; ./prepare.sh; rm *.pbf; mv *.pmtiles ../web/"
     minute: "10"
-    hour: "3"
+    hour: "6"
 
 - name: Create apache log directory
   become: yes
