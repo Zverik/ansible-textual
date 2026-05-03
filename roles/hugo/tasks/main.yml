@@ -1,0 +1,32 @@
+---
+- name: Check that Hugo is installed
+  stat:
+    path: "{{ hugo_path }}/hugo"
+  register: hugo_binary
+
+- name: Check Hugo version
+  when: hugo_binary.stat.exists
+  shell: "set -o pipefail && {{ hugo_path }}/hugo version | sed -E 's/.*v([[:digit:].]+).*/\\1/'"
+  args:
+    executable: /bin/bash
+  changed_when: false
+  register: hugo_existing_version
+
+- name: Process the things we've learnt
+  set_fact:
+    need_new_hugo: "{{ not hugo_binary.stat.exists or hugo_existing_version.stdout_lines[0] != hugo_version }}"
+
+- name: Delete the old Hugo binary
+  when: need_new_hugo
+  file:
+    path: "{{ hugo_path }}/hugo"
+    state: absent
+
+- name: Download Hugo
+  when: need_new_hugo
+  unarchive:
+    src: "https://github.com/gohugoio/hugo/releases/download/v{{ hugo_version }}/hugo_extended_{{ hugo_version }}_linux-amd64.tar.gz"
+    remote_src: true
+    include: [hugo]
+    dest: "{{ hugo_path }}"
+    mode: "0755"

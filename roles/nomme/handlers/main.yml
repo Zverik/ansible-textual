@@ -1,0 +1,20 @@
+---
+- name: reload apache
+  become: yes
+  systemd: name=apache2 state=reloaded
+
+- name: restart apache
+  become: yes
+  systemd: name=apache2 state=restarted
+
+- name: restart stfed
+  become: yes
+  service:
+    name: stfed
+    state: restarted
+    enabled: true
+
+- name: rebuild website
+  command:
+    cmd: hugo build
+    chdir: "{{ sites }}/{{ domain }}"

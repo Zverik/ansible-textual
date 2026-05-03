@@ -1,0 +1,13 @@
+{{ $params := .Page.Params }}
+{{ if $params.track }}
+{{ with .Page.Resources.Get (print $params.track ".png") }}
+<p><img src="{{ . }}"></p>
+{{ end }}
+{{ with .Page.Resources.Get (print $params.track ".gpx") }}
+<p style="text-align: center;"><a href="{{ . }}">Laadi alla GPX</a>
+{{ if $params.length }}
+({{ $params.length }} km)
+{{- end -}}
+</p>
+{{ end }}
+{{ end }}

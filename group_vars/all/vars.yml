@@ -3,6 +3,7 @@ ntp_timezone: Europe/Tallinn
 admin_email: ilya@zverev.info
 admin: zverik
 www_user: www-data
+syncthing_user: syncthing
 
 borg_repo: "{{ v_borg_repo }}"
 borg_pass: "{{ v_borg_pass }}"

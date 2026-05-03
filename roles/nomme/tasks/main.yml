@@ -1,0 +1,108 @@
+---
+- name: Create writable root directory
+  become: yes
+  file:
+    path: "{{ sites }}/{{ domain }}"
+    state: directory
+    owner: "{{ admin }}"
+    mode: '0777'
+
+- name: Create a directory structure for a Hugo website
+  become: yes
+  file:
+    path: "{{ sites }}/{{ domain }}/{{ item }}"
+    state: directory
+    owner: "{{ admin }}"
+  loop:
+    - assets
+    - layouts
+    - layouts/_shortcodes
+    - static
+    - themes
+
+- name: Upload Hugo config
+  copy:
+    src: hugo.toml
+    dest: "{{ sites }}/{{ domain }}/"
+  notify: rebuild website
+
+- name: Upload map shortcode
+  copy:
+    src: map.html
+    dest: "{{ sites }}/{{ domain }}/layouts/_shortcodes/"
+  notify: rebuild website
+
+- name: Clone the papermod theme
+  git:
+    repo: https://github.com/adityatelange/hugo-PaperMod.git
+    dest: "{{ sites }}/{{ domain }}/themes/papermod"
+    depth: 1
+  notify: rebuild website
+
+- name: Close the gallery shortcodes
+  git:
+    repo: https://github.com/mfg92/hugo-shortcode-gallery.git
+    dest: "{{ sites }}/{{ domain }}/themes/hugo-shortcode-gallery"
+    depth: 1
+  notify: rebuild website
+
+- name: Make content directory sync-able
+  become: yes
+  file:
+    path: "{{ sites }}/{{ domain }}/content"
+    state: directory
+    mode: '0755'
+    owner: "{{ syncthing_user }}"
+    group: "{{ syncthing_user }}"
+
+- name: Uploading updating script
+  become: yes
+  template:
+    src: update_nomme.sh.j2
+    dest: /srv/update_nomme.sh
+    mode: '0755'
+    owner: syncthing
+
+- name: Add syncthing hook
+  become: yes
+  blockinfile:
+    path: /home/syncthing/.config/stfed/hooks.toml
+    create: true
+    owner: syncthing
+    block: |
+      [[hooks]]
+      folder = "{{ sites }}/{{ domain }}/content"
+      event = "folder_down_sync_done"
+      allow_concurrent = false
+      command = "/srv/update_nomme.sh"
+  notify:
+    - restart stfed
+
+- name: Create apache log directory
+  become: yes
+  file:
+    path: /var/log/apache2/{{ domain }}
+    state: directory
+    mode: 0755
+    owner: www-data
+
+- name: Check that the certificate exists
+  become: yes
+  stat:
+    path: "{{ cert_path.nomme }}/privkey.pem"
+  register: nomme_cert
+
+- name: Add apache domain
+  become: yes
+  template:
+    src: domain.j2
+    dest: /etc/apache2/sites-available/{{ domain }}.conf
+  notify: reload apache
+
+- name: Enable apache domain
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ domain }}.conf
+    dest: /etc/apache2/sites-enabled/{{ domain }}.conf
+    state: link
+  notify: reload apache

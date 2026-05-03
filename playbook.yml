@@ -29,6 +29,7 @@
     - { role: svn, tags: svn }
     - { role: znc, tags: znc }
     - { role: syncthing, tags: syncthing }
+    - { role: hugo, tags: hugo }
   tasks:
     - name: Restart MySQL when it's down
       cron:
@@ -79,6 +80,7 @@
     - { role: shtosm, tags: shtosm }
     - { role: nelgi, tags: nelgi }
     - { role: izv, tags: izv }
+    - { role: nomme, tags: nomme }
     # - sharemap
     # - shtosm-twitter
 

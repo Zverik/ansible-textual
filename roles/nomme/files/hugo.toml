@@ -1,0 +1,15 @@
+baseURL = 'https://nomme.izv.ee/'
+locale = 'et'
+title = 'Nõmme rattaretked'
+theme = ['papermod', 'hugo-shortcode-gallery']
+
+[params]
+gallerySortOrder = "asc"
+galleryRowHeight = 150
+galleryRowMargins = 5
+galleryThumbnailResizeOptions = "300x300 q85 Lanczos"
+galleryShowExif = false
+galleryLoadJQuery = true
+galleryPreviewType = "blur"
+galleryEmbedPreview = true
+galleryLastRow = "left"
