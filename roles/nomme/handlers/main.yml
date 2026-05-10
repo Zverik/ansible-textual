@@ -15,6 +15,6 @@
     enabled: true
 
 - name: rebuild website
-  command:
-    cmd: hugo build
-    chdir: "{{ sites }}/{{ domain }}"
+  become: yes
+  become_user: syncthing
+  command: /srv/update_nomme.sh

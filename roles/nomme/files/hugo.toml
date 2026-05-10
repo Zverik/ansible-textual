@@ -13,3 +13,10 @@ galleryLoadJQuery = true
 galleryPreviewType = "blur"
 galleryEmbedPreview = true
 galleryLastRow = "left"
+hideMeta = true
+
+[cover]
+hiddenInSingle = true
+
+[pagination]
+pagerSize = 48
